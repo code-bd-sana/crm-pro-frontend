@@ -9,9 +9,10 @@ This document tracks the ongoing progress of the CRM/ERP Frontend project. **AI 
 - [x] Created `docs/api-spec.md` with endpoints and integration standards (Socket.io, Token Refresh, Pagination).
 - [x] Initial project setup & core package installation (Zustand, React Query, Axios, Socket.io-client, shadcn/ui).
 - [x] Set up Global Axios Interceptor and Auth Store.
+- [x] Phase 3: Authentication & Core Layouts (Login Page, Sidebar, Topbar, Dashboard Layout).
 
 ## 🟡 In Progress
-- [ ] Phase 3: Authentication & Core Layouts
+- [ ] Phase 4: Dashboard Metrics & Real-time Integration
 
 ## 🔴 Pending Tasks / Roadmap
 
