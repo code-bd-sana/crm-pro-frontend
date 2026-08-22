@@ -1,5 +1,6 @@
-import { Search, Filter, Plus, MoreVertical } from "lucide-react";
+import { Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { NewClientButton } from "@/components/dashboard/NewClientButton";
 
 const clientsData = [
   { id: 1, initials: "AC", name: "Acme Corp", industry: "Technology", contact: "Sarah Chen", lastActive: "2 hours ago", status: "Active", ltv: "$45,000" },
@@ -17,10 +18,7 @@ export default function ClientsPage() {
       {/* Header */}
       <div className="flex items-center justify-between h10">
         <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Clients</h1>
-        <button className="flex items-center justify-center gap-2 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white rounded-[4px] h-[36px] px-4 transition-colors">
-          <Plus className="w-4 h-4" />
-          <span className="font-medium text-[14px]">New Client</span>
-        </button>
+        <NewClientButton />
       </div>
 
       {/* Controls Container (Search & Filter) */}
