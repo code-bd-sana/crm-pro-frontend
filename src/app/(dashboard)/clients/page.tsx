@@ -14,7 +14,7 @@ const clientsData = [
 
 export default function ClientsPage() {
   return (
-    <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full mx-auto w-full">
+    <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full">
 
       {/* Header */}
       <div className="flex items-center justify-between h10">
