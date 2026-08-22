@@ -7,8 +7,8 @@ import { UpcomingDeadlines } from "@/components/dashboard/UpcomingDeadlines";
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col flex-1 px-6 pt-6 pb-0 gap-6">
-      
+    <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 w-full mx-auto">
+
       {/* Header */}
       <div className="flex flex-col gap-1 h-[56px]">
         <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Good morning, John</h1>
