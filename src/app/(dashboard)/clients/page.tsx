@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { NewClientButton } from "@/components/dashboard/NewClientButton";
@@ -64,12 +65,12 @@ export default function ClientsPage() {
                     <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
+                    <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
                       <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
                         <span className="text-[#0891B2] font-medium text-[12px]">{client.initials}</span>
                       </div>
-                      <span className="text-[#111111] font-medium text-[14px]">{client.name}</span>
-                    </div>
+                      <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.name}</span>
+                    </Link>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-[#737373] font-normal text-[14px]">{client.industry}</span>
