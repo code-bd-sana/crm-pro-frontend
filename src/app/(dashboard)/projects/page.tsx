@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { NewProjectDialog } from "@/components/projects/NewProjectDialog";
 
 type Tab = "All" | "Active" | "On Hold" | "Completed";
 
@@ -74,12 +75,16 @@ export default function ProjectsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("All");
   const tabs: Tab[] = ["All", "Active", "On Hold", "Completed"];
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const filteredProjects = activeTab === "All"
     ? projectsData
     : projectsData.filter((p) => p.status === activeTab);
 
   return (
     <div className="flex flex-col px-6 pt-6 gap-6 w-full pb-6">
+      
+      <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -89,7 +94,10 @@ export default function ProjectsPage() {
             {filteredProjects.length} projects
           </p>
         </div>
-        <button className="flex items-center justify-center gap-2 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white rounded-[4px] h-[36px] px-4 transition-colors">
+        <button 
+          onClick={() => setIsDialogOpen(true)}
+          className="flex items-center justify-center gap-2 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white rounded-[4px] h-[36px] px-4 transition-colors"
+        >
           <Plus className="w-4 h-4" />
           <span className="font-medium text-[14px]">New Project</span>
         </button>

@@ -1,5 +1,9 @@
-import { X, ChevronDown } from "lucide-react";
+import { X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -7,107 +11,100 @@ interface AddClientModalProps {
 }
 
 export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-[#FFFFFF] rounded-[6px] w-[576px] max-w-[95vw] shadow-lg border border-[#E5E5E5] flex flex-col relative overflow-hidden">
-        
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-[25px] right-[25px] text-[#A3A3A3] hover:text-[#111111] transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent showCloseButton={false} className="sm:max-w-[576px] p-0 border-[#E5E5E5] gap-0 !bg-[#FFFFFF] rounded-[6px] shadow-lg">
 
         {/* Header */}
-        <div className="px-[25px] pt-[25px] pb-4">
-          <h2 className="text-[#111111] font-semibold text-[18px] leading-[18px]">Add New Client</h2>
-        </div>
+        <DialogHeader className="px-[25px] pt-[25px] pb-4">
+          <DialogTitle className="text-[#111111] font-semibold text-[18px] leading-[18px]">
+            Add New Client
+          </DialogTitle>
+          <DialogClose className="absolute right-[25px] top-[25px] text-[#A3A3A3] hover:text-[#111111] transition-colors">
+            <X className="w-4 h-4" />
+          </DialogClose>
+        </DialogHeader>
 
         {/* Form Body */}
         <div className="px-[25px] py-4 flex flex-col gap-4 overflow-y-auto max-h-[70vh]">
-          
+
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Company Name</label>
-              <Input placeholder="Acme Corp" className="h-[36px] border-[#E5E5E5] bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
+              <Input placeholder="Acme Corp" className="h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
             </div>
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Industry</label>
-              <div className="relative">
-                <select className="w-full h-[36px] px-3 border border-[#E5E5E5] rounded-[4px] bg-[#FFFFFF] text-[#737373] text-[14px] appearance-none focus:outline-none focus:ring-1 focus:ring-[#0891B2]">
-                  <option value="">Select industry</option>
-                  <option value="tech">Technology</option>
-                  <option value="finance">Finance</option>
-                  <option value="marketing">Marketing</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" />
-              </div>
+              <Select>
+                <SelectTrigger className="w-full h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] [&>span]:text-[#737373] data-[state=open]:ring-[#0891B2]">
+                  <SelectValue placeholder="Select industry" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tech">Technology</SelectItem>
+                  <SelectItem value="finance">Finance</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Contact Name</label>
-              <Input placeholder="John Doe" className="h-[36px] border-[#E5E5E5] bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
+              <Input placeholder="John Doe" className="h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
             </div>
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Email</label>
-              <Input type="email" placeholder="john@acme.com" className="h-[36px] border-[#E5E5E5] bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
+              <Input type="email" placeholder="john@acme.com" className="h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
             </div>
           </div>
 
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Phone</label>
-              <Input placeholder="+1 (555) 123-4567" className="h-[36px] border-[#E5E5E5] bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
+              <Input placeholder="+1 (555) 123-4567" className="h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
             </div>
             <div className="flex flex-col gap-2 flex-1">
               <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Website</label>
-              <Input placeholder="https://acme.com" className="h-[36px] border-[#E5E5E5] bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
+              <Input placeholder="https://acme.com" className="h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] focus-visible:ring-[#0891B2]" />
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Status</label>
-            <div className="relative">
-              <select className="w-full h-[36px] px-3 border border-[#E5E5E5] rounded-[4px] bg-[#FFFFFF] text-[#111111] text-[14px] appearance-none focus:outline-none focus:ring-1 focus:ring-[#0891B2]">
-                <option value="lead">Lead</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A3A3A3] pointer-events-none" />
-            </div>
+            <Select defaultValue="lead">
+              <SelectTrigger className="w-full h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] data-[state=open]:ring-[#0891B2]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="lead">Lead</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex flex-col gap-2">
             <label className="text-[#111111] font-medium text-[14px] leading-[14px]">Notes</label>
-            <textarea 
+            <Textarea
               placeholder="Additional information about the client..."
-              className="w-full h-[64px] px-3 py-2 border border-[#E5E5E5] rounded-[4px] bg-[#FFFFFF] text-[#737373] text-[14px] resize-none focus:outline-none focus:ring-1 focus:ring-[#0891B2]"
-            ></textarea>
+              className="min-h-[64px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] placeholder:text-[#737373] resize-none focus-visible:ring-[#0891B2]"
+            />
           </div>
 
         </div>
 
         {/* Footer */}
         <div className="px-[25px] py-4 flex items-center justify-end gap-2 border-t border-[#E5E5E5] mt-2">
-          <button 
-            onClick={onClose}
-            className="h-[36px] px-4 bg-[#FAFAFA] border border-[#E5E5E5] hover:bg-gray-50 rounded-[4px] text-[#111111] font-medium text-[14px] transition-colors"
-          >
+          <DialogClose className="inline-flex items-center justify-center h-[36px] px-4 bg-[#FAFAFA] border border-[#E5E5E5] hover:bg-gray-50 rounded-[4px] text-[#111111] font-medium text-[14px] transition-colors">
             Cancel
-          </button>
-          <button 
-            className="h-[36px] px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 rounded-[4px] text-white font-medium text-[14px] transition-colors"
-          >
+          </DialogClose>
+          <Button className="h-[36px] px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 rounded-[4px] text-white font-medium text-[14px] transition-colors">
             Save Client
-          </button>
+          </Button>
         </div>
 
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
