@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { NewClientButton } from "@/components/dashboard/NewClientButton";
 
 const clientsData = [
@@ -43,45 +44,45 @@ export default function ClientsPage() {
       {/* Table Container */}
       <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[10px] flex-1 flex flex-col overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[1000px]">
-            <thead>
-              <tr className="bg-[#F5F5F5] border-b border-[#E5E5E5]">
-                <th className="w-12 px-6 py-3">
+          <Table className="w-full text-left min-w-[1000px]">
+            <TableHeader>
+              <TableRow className="bg-[#F5F5F5] border-b border-[#E5E5E5] hover:bg-[#F5F5F5]">
+                <TableHead className="w-12 px-6 py-3">
                   <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
-                </th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Client</th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Industry</th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Last Active</th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider text-right">LTV</th>
-                <th className="w-12 px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Client</TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Industry</TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Contact</TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Last Active</TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Status</TableHead>
+                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider text-right">LTV</TableHead>
+                <TableHead className="w-12 px-6 py-3"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {clientsData.map((client, idx) => (
-                <tr key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clientsData.length - 1 ? 'border-b border-[#E5E5E5]' : ''}`}>
-                  <td className="px-6 py-4">
+                <TableRow key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clientsData.length - 1 ? 'border-b border-[#E5E5E5]' : 'border-0'}`}>
+                  <TableCell className="px-6 py-4">
                     <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
                       <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
                         <span className="text-[#0891B2] font-medium text-[12px]">{client.initials}</span>
                       </div>
                       <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.name}</span>
                     </Link>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <span className="text-[#737373] font-normal text-[14px]">{client.industry}</span>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <span className="text-[#737373] font-normal text-[14px]">{client.contact}</span>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <span className="text-[#737373] font-normal text-[14px]">{client.lastActive}</span>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     {client.status === "Active" ? (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#DCFCE7] text-[#166534] font-medium text-[12px]">
                         Active
@@ -91,19 +92,19 @@ export default function ClientsPage() {
                         Inactive
                       </span>
                     )}
-                  </td>
-                  <td className="px-6 py-4 text-right">
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
                     <span className="text-[#111111] font-medium text-[14px]">{client.ltv}</span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
                     <button className="text-[#737373] hover:text-[#111111] transition-colors">
                       <MoreVertical className="w-4 h-4" />
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}

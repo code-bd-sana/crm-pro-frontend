@@ -5,12 +5,11 @@ import { ClientProfileTabs } from "@/components/clients/ClientProfileTabs";
 
 export default function ClientProfilePage() {
   return (
-    <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full">
-      
+    <div className="flex flex-col px-6 pt-6 pb-6 gap-6 w-full min-h-max">
       {/* Back Button */}
       <div>
-        <Link 
-          href="/clients" 
+        <Link
+          href="/clients"
           className="inline-flex items-center gap-2 text-[#737373] hover:text-[#111111] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
