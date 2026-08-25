@@ -75,8 +75,8 @@ export function AddInvoiceModal({ isOpen, onClose }: AddInvoiceModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[703px] p-0 overflow-hidden bg-[#FAFAFA] border-[#E5E5E5] shadow-md rounded-[6px]">
-        <div className="px-6 pt-6 pb-4">
+      <DialogContent className="max-w-[703px] sm:max-w-[703px] p-0 overflow-hidden bg-[#FAFAFA] border-[#E5E5E5] shadow-md rounded-[6px]">
+        <div className="px-4 pt-4 pb-4">
           <DialogHeader>
             <DialogTitle className="text-[#111111] font-semibold text-[18px]">
               Create New Invoice
@@ -84,7 +84,7 @@ export function AddInvoiceModal({ isOpen, onClose }: AddInvoiceModalProps) {
           </DialogHeader>
         </div>
 
-        <div className="px-6 pb-6 flex flex-col gap-6 max-h-[70vh] overflow-y-auto">
+        <div className="px-6  flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
           {/* Row 1: Invoice Number, Issue Date, Due Date */}
           <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col gap-2">
@@ -212,9 +212,8 @@ export function AddInvoiceModal({ isOpen, onClose }: AddInvoiceModalProps) {
                     <button
                       onClick={() => removeLineItem(item.id)}
                       disabled={lineItems.length === 1}
-                      className={`text-[#737373] hover:text-[#EF4444] transition-colors p-2 rounded-xs ${
-                        lineItems.length === 1 ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`text-[#737373] hover:text-[#EF4444] transition-colors p-2 rounded-xs ${lineItems.length === 1 ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -280,7 +279,7 @@ export function AddInvoiceModal({ isOpen, onClose }: AddInvoiceModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-[#FAFAFA] border-t border-[#E5E5E5] flex justify-end gap-2">
+        <div className="px-4 py-4 bg-[#FAFAFA] border-t border-[#E5E5E5] flex justify-end gap-2">
           <Button
             variant="outline"
             onClick={onClose}
