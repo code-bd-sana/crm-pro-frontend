@@ -24,9 +24,9 @@ export default function ClientsPage() {
       </div>
 
       {/* Controls Container (Search & Filter) */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         {/* Search */}
-        <div className="relative w-[320px]">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
           <Input
             placeholder="Search clients..."
@@ -35,7 +35,7 @@ export default function ClientsPage() {
         </div>
 
         {/* Filter Button */}
-        <button className="flex items-center justify-center gap-2 bg-[#FFFFFF] border border-[#E5E5E5] hover:bg-gray-50 text-[#111111] rounded-[4px] h-[36px] px-4 transition-colors">
+        <button className="flex items-center justify-center bg-[#FFFFFF] border border-[#E5E5E5] hover:bg-gray-50 text-[#111111] rounded-[4px] h-[36px] px-4 transition-colors shrink-0">
           <Filter className="w-4 h-4 text-[#737373]" />
           <span className="font-medium text-[14px]">Filter</span>
         </button>

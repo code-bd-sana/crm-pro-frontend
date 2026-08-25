@@ -98,7 +98,7 @@ export default function TasksPage() {
             <Button 
               variant="outline" 
               onClick={() => setViewMode("kanban")}
-              className="border-[#E5E5E5] text-[#111111] font-medium h-10 px-4"
+              className="border-[#E5E5E5] text-[#111111] font-medium h-10 px-4 rounded-[3px]"
             >
               <LayoutGrid className="w-4 h-4 mr-2" />
               Kanban View
@@ -107,7 +107,7 @@ export default function TasksPage() {
             <Button 
               variant="outline" 
               onClick={() => setViewMode("list")}
-              className="border-[#E5E5E5] text-[#111111] font-medium h-10 px-4"
+              className="border-[#E5E5E5] text-[#111111] font-medium h-10 px-4 rounded-[3px]"
             >
               <List className="w-4 h-4 mr-2" />
               Back to List
@@ -115,7 +115,7 @@ export default function TasksPage() {
           )}
           <Button 
             onClick={() => setIsAddTaskOpen(true)}
-            className="bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium h-10 px-4"
+            className="bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium h-10 px-4 rounded-[3px]"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Task
@@ -124,11 +124,7 @@ export default function TasksPage() {
       </div>
 
       {/* Filter and Search */}
-      <div className="flex items-center gap-3 w-full">
-        <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-10 px-4 shrink-0">
-          <Filter className="w-4 h-4 mr-2" />
-          Filter
-        </Button>
+      <div className="flex items-center justify-between gap-4 w-full">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
           <Input
@@ -136,6 +132,10 @@ export default function TasksPage() {
             className="pl-9 h-10 w-full bg-white border-[#E5E5E5] text-[#111111] placeholder:text-[#A3A3A3] focus-visible:ring-1 focus-visible:ring-[#0891B2]"
           />
         </div>
+        <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-10 px-4 shrink-0 rounded-[3px]">
+          <Filter className="w-4 h-4 mr-2" />
+          Filter
+        </Button>
       </div>
 
       {viewMode === "list" ? (
@@ -227,7 +227,7 @@ export default function TasksPage() {
                       )}
                     </TableCell>
                     <TableCell className="py-4 text-center">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-[#111111]">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-[#111111] rounded-[3px]">
                         <MoreHorizontal className="w-5 h-5" />
                       </Button>
                     </TableCell>
@@ -243,27 +243,27 @@ export default function TasksPage() {
               Showing 1 to 5 of 24 entries
             </p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC]">
+              <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
                 Previous
               </Button>
               
               <div className="flex items-center gap-1">
-                <Button variant="outline" className="w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2]">
+                <Button variant="outline" className="w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2] rounded-[3px]">
                   1
                 </Button>
-                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC]">
+                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
                   2
                 </Button>
-                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC]">
+                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
                   3
                 </Button>
                 <span className="text-[#A3A3A3] px-1">...</span>
-                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC]">
+                <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
                   5
                 </Button>
               </div>
 
-              <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC]">
+              <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
                 Next
               </Button>
             </div>

@@ -83,7 +83,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex flex-col px-6 pt-6 gap-6 w-full pb-6">
-      
+
       <NewProjectDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
       {/* Header */}
@@ -94,7 +94,7 @@ export default function ProjectsPage() {
             {filteredProjects.length} projects
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setIsDialogOpen(true)}
           className="flex items-center justify-center gap-2 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white rounded-[4px] h-[36px] px-4 transition-colors"
         >
@@ -104,8 +104,8 @@ export default function ProjectsPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex items-center justify-between">
-        <div className="relative w-[320px]">
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
           <Input
             placeholder="Search projects..."
@@ -124,11 +124,10 @@ export default function ProjectsPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-1.5 rounded-[8px] font-medium text-[14px] transition-colors ${
-              activeTab === tab
-                ? "bg-[#FFFFFF] text-[#111111] shadow-sm"
-                : "text-[#727272] hover:text-[#111111]"
-            }`}
+            className={`px-4 py-1.5 rounded-[8px] font-medium text-[14px] transition-colors ${activeTab === tab
+              ? "bg-[#FFFFFF] text-[#111111] shadow-sm"
+              : "text-[#727272] hover:text-[#111111]"
+              }`}
           >
             {tab}
           </button>
