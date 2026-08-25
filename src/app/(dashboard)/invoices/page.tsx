@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Search, Filter, Plus, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -179,7 +180,9 @@ export default function InvoicesPage() {
             {invoicesData.map((invoice) => (
               <TableRow key={invoice.id} className="border-b border-[#E5E5E5] hover:bg-[#F8FAFC]">
                 <TableCell className="px-6 py-3 h-[49px] text-[14px] font-medium text-[#111111] whitespace-nowrap">
-                  {invoice.id}
+                  <Link href={`/invoices/${invoice.id}`} className="hover:text-[#0891B2] hover:underline transition-colors">
+                    {invoice.id}
+                  </Link>
                 </TableCell>
                 <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
                   {invoice.client}
