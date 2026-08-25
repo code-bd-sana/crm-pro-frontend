@@ -20,13 +20,13 @@ This document tracks the ongoing progress of the CRM/ERP Frontend project. **AI 
 ## 🔴 Pending Tasks / Roadmap
 
 ### Phase 4: Dashboard Metrics & Real-time Integration
-- [ ] Build Dashboard overview metrics & charts.
+- [x] Phase 4: Dashboard Metrics & Analytics (Team & Global Reports).
 - [ ] Integrate Real-time Socket.io (`joinUserRoom` and `newNotification`).
 
 ### Phase 3: Modules (CRUD)
-- [ ] Users & Team Module.
-- [ ] Clients & Departments Modules.
-- [ ] Invoices & Analytics Modules.
+- [x] Users & Team Module.
+- [x] Clients Module.
+- [x] Invoices Module.
 
 ### Other / Tech Debt
 - [ ] Setup Role-Based Access Control (RBAC) logic for routes and menus.

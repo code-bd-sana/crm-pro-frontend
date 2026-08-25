@@ -10,7 +10,9 @@ A modern, responsive, and enterprise-grade CRM (Customer Relationship Management
   - Switch seamlessly between List and drag-and-drop Kanban board views.
   - Interactive right-side panel for viewing and editing task details, including subtasks and activity history.
 - **Project Tracking:** Monitor project statuses, deadlines, and assigned teams.
-- **Invoicing System:** Manage and generate invoices with status tracking.
+- **Invoicing System:** Manage and generate invoices with status tracking, dynamic line items, and detailed views.
+- **Team Management:** Team listing, individual member details, and comprehensive team analytics.
+- **Reporting & Analytics:** In-depth interactive charts (Recharts) for revenue, tasks, and project tracking.
 - **Messaging/Chat:** Built-in team communication interface.
 - **Real-time Updates:** Ready for Socket.io integration for instant notifications.
 - **Beautiful UI/UX:** Built with Tailwind CSS and fully customizable accessible components from shadcn/ui.
@@ -23,6 +25,7 @@ A modern, responsive, and enterprise-grade CRM (Customer Relationship Management
 - **State Management:** [Zustand](https://github.com/pmndrs/zustand)
 - **Data Fetching:** React Query & Axios
 - **Drag and Drop:** [@dnd-kit](https://dndkit.com/)
+- **Charts:** [Recharts](https://recharts.org/)
 - **Forms & Validation:** React Hook Form & Zod
 - **Icons:** [Lucide React](https://lucide.dev/)
 
@@ -79,7 +82,9 @@ src/
 │   ├── ui/               # Reusable UI primitives (shadcn/ui)
 │   ├── layout/           # Global layouts (Sidebar, Header)
 │   ├── dashboard/        # Dashboard specific components
-│   └── tasks/            # Task management components (Kanban, etc.)
+│   ├── tasks/            # Task management components (Kanban, etc.)
+│   ├── team/             # Team management & analytics components
+│   └── reports/          # Reports & analytics components
 ├── hooks/                # Custom React hooks
 ├── lib/                  # Utility functions and configurations
 ├── services/             # API services and network calls
