@@ -10,9 +10,10 @@ import { MessageSquare, Calendar } from "lucide-react";
 
 interface KanbanCardProps {
   task: Task;
+  onTaskClick?: (task: Task) => void;
 }
 
-export function KanbanCard({ task }: KanbanCardProps) {
+export function KanbanCard({ task, onTaskClick }: KanbanCardProps) {
   const {
     setNodeRef,
     attributes,
@@ -39,6 +40,7 @@ export function KanbanCard({ task }: KanbanCardProps) {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => onTaskClick?.(task)}
       className={`bg-white p-4 rounded-xl border border-[#E5E5E5] flex flex-col gap-3 cursor-grab active:cursor-grabbing hover:shadow-sm transition-shadow ${
         isDragging ? "opacity-50 ring-2 ring-[#0891B2] shadow-md" : ""
       }`}

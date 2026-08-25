@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/table";
 import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List } from "lucide-react";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
+import { AddTaskModal } from "@/components/tasks/AddTaskModal";
+import { TaskDetailsPanel } from "@/components/tasks/TaskDetailsPanel";
 
 const tasks = [
   {
@@ -67,6 +69,17 @@ const tasks = [
 
 export default function TasksPage() {
   const [viewMode, setViewMode] = React.useState<"list" | "kanban">("list");
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isAddTaskOpen, setIsAddTaskOpen] = React.useState(false);
+  const [selectedTask, setSelectedTask] = React.useState<any | null>(null);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="flex-1 flex flex-col gap-6 p-6 md:p-8 bg-[#FAFAFA] min-h-screen">
@@ -100,7 +113,10 @@ export default function TasksPage() {
               Back to List
             </Button>
           )}
-          <Button className="bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium h-10 px-4">
+          <Button 
+            onClick={() => setIsAddTaskOpen(true)}
+            className="bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium h-10 px-4"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Task
           </Button>
@@ -143,8 +159,12 @@ export default function TasksPage() {
               </TableHeader>
               <TableBody>
                 {tasks.map((task) => (
-                  <TableRow key={task.id} className="border-b border-[#E5E5E5] hover:bg-[#F8FAFC]">
-                    <TableCell className="w-[50px] text-center">
+                  <TableRow 
+                    key={task.id} 
+                    className="border-b border-[#E5E5E5] hover:bg-[#F8FAFC] cursor-pointer"
+                    onClick={() => setSelectedTask(task)}
+                  >
+                    <TableCell className="w-[50px] text-center" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         defaultChecked={task.status === "Completed"}
                         className="border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white"
@@ -250,9 +270,11 @@ export default function TasksPage() {
           </div>
         </>
       ) : (
-        <KanbanBoard initialTasks={tasks as any} />
+        <KanbanBoard initialTasks={tasks as any} onTaskClick={setSelectedTask} />
       )}
 
+      <AddTaskModal isOpen={isAddTaskOpen} onClose={() => setIsAddTaskOpen(false)} />
+      <TaskDetailsPanel task={selectedTask} isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} />
     </div>
   );
 }

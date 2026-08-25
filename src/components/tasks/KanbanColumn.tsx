@@ -9,9 +9,10 @@ import { Task } from "./KanbanBoard";
 interface KanbanColumnProps {
   columnId: string;
   tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
-export function KanbanColumn({ columnId, tasks }: KanbanColumnProps) {
+export function KanbanColumn({ columnId, tasks, onTaskClick }: KanbanColumnProps) {
   const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks]);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -41,7 +42,7 @@ export function KanbanColumn({ columnId, tasks }: KanbanColumnProps) {
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <KanbanCard key={task.id} task={task} />
+            <KanbanCard key={task.id} task={task} onTaskClick={onTaskClick} />
           ))}
         </SortableContext>
       </div>

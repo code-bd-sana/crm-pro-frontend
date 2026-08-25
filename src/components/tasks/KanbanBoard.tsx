@@ -34,11 +34,12 @@ export type Task = {
 
 type KanbanBoardProps = {
   initialTasks: Task[];
+  onTaskClick?: (task: Task) => void;
 };
 
 const COLUMNS = ["To Do", "In Progress", "Done"] as const;
 
-export function KanbanBoard({ initialTasks }: KanbanBoardProps) {
+export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
   // Normalize status for Kanban board to match the 3 columns
   const normalizedTasks = initialTasks.map((t) => ({
     ...t,
@@ -148,6 +149,7 @@ export function KanbanBoard({ initialTasks }: KanbanBoardProps) {
             key={colId}
             columnId={colId}
             tasks={tasks.filter((t) => t.column === colId) as any}
+            onTaskClick={onTaskClick}
           />
         ))}
 
