@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Search, Filter, Plus, MoreHorizontal, Mail, Phone, BarChart2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AddTeamMemberModal } from "@/components/team/AddTeamMemberModal";
 
 const teamData = [
   {
@@ -111,6 +113,7 @@ const teamData = [
 export default function TeamPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("All");
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
 
   React.useEffect(() => {
     setIsMounted(true);
@@ -131,7 +134,10 @@ export default function TeamPage() {
             <BarChart2 className="w-4 h-4 mr-2" />
             Analytics
           </Button>
-          <Button className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors">
+          <Button 
+            onClick={() => setIsAddMemberOpen(true)}
+            className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors"
+          >
             <Plus className="w-4 h-4 mr-2" />
             <span className="font-medium text-[14px]">Add Team Member</span>
           </Button>
@@ -190,9 +196,12 @@ export default function TeamPage() {
                   {member.initials}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[16px] font-bold text-[#111111]">
+                  <Link 
+                    href={`/team/${member.id}`} 
+                    className="text-[16px] font-bold text-[#111111] hover:text-[#0891B2] hover:underline transition-colors"
+                  >
                     {member.name}
-                  </span>
+                  </Link>
                   <span className="text-[14px] text-[#737373]">
                     {member.role}
                   </span>
@@ -257,6 +266,8 @@ export default function TeamPage() {
           </div>
         ))}
       </div>
+      
+      <AddTeamMemberModal isOpen={isAddMemberOpen} onClose={() => setIsAddMemberOpen(false)} />
     </div>
   );
 }
