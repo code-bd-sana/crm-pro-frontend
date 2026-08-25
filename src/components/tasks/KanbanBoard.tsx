@@ -29,7 +29,7 @@ export type Task = {
   project: string;
   dueDate: string;
   priority: string;
-  status: "To Do" | "In Progress" | "Done" | "Completed" | "Pending";
+  status: "Backlog" | "To Do" | "In Progress" | "Done" | "Completed" | "Pending";
 };
 
 type KanbanBoardProps = {
@@ -37,7 +37,7 @@ type KanbanBoardProps = {
   onTaskClick?: (task: Task) => void;
 };
 
-const COLUMNS = ["To Do", "In Progress", "Done"] as const;
+const COLUMNS = ["Backlog", "To Do", "In Progress", "Done"] as const;
 
 export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
   // Normalize status for Kanban board to match the 3 columns
@@ -102,7 +102,7 @@ export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const newTasks = [...tasks];
-        newTasks[activeIndex].column = overId as "To Do" | "In Progress" | "Done";
+        newTasks[activeIndex].column = overId as "Backlog" | "To Do" | "In Progress" | "Done";
         return arrayMove(newTasks, activeIndex, activeIndex);
       });
     }
