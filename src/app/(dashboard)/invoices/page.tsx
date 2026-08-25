@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AddInvoiceModal } from "@/components/invoices/AddInvoiceModal";
+import { Button } from "@/components/ui/button";
 
 const invoicesData = [
   {
@@ -109,14 +110,14 @@ export default function InvoicesPage() {
 
   return (
     <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full">
-      
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Invoices</h1>
           <p className="text-[#737373] text-[14px]">7 invoices</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsAddInvoiceOpen(true)}
           className="flex items-center justify-center gap-2 bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-xs h-[36px] px-4 transition-colors"
         >
@@ -160,79 +161,84 @@ export default function InvoicesPage() {
       </div>
 
       {/* Table Container */}
-      <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[6px] flex-1 flex flex-col overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table className="w-full text-left min-w-[1000px]">
-            <TableHeader>
-              <TableRow className="border-b border-[#E5E5E5] hover:bg-transparent">
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Invoice ID</TableHead>
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Client</TableHead>
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Issue Date</TableHead>
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Due Date</TableHead>
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111] text-right">Amount</TableHead>
-                <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Status</TableHead>
-                <TableHead className="w-12 px-6 py-3 h-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoicesData.map((invoice) => (
-                <TableRow key={invoice.id} className="border-b border-[#E5E5E5] hover:bg-[#F8FAFC]">
-                  <TableCell className="px-6 py-3 h-[49px] text-[14px] font-medium text-[#111111] whitespace-nowrap">
-                    {invoice.id}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
-                    {invoice.client}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
-                    {invoice.issueDate}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
-                    {invoice.dueDate}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] text-[14px] font-medium text-[#111111] text-right whitespace-nowrap">
-                    {invoice.amount}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] whitespace-nowrap">
-                    {getStatusBadge(invoice.status)}
-                  </TableCell>
-                  <TableCell className="px-6 py-3 h-[49px] text-right">
-                    <button className="text-[#A3A3A3] hover:text-[#111111] transition-colors rounded-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2] focus:ring-offset-2">
-                      <MoreHorizontal className="w-5 h-5" />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+      <div className="bg-white rounded-[10px] border border-[#E5E5E5] overflow-hidden flex flex-col">
 
-        {/* Pagination Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-[#E5E5E5] bg-[#FFFFFF] mt-auto">
-          <button className="text-[14px] font-medium text-[#737373] hover:text-[#111111] transition-colors px-3 py-1">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-[#E5E5E5] hover:bg-transparent">
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Invoice ID</TableHead>
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Client</TableHead>
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Issue Date</TableHead>
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Due Date</TableHead>
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111] text-right">Amount</TableHead>
+              <TableHead className="px-6 py-3 h-10 text-[14px] font-medium text-[#111111]">Status</TableHead>
+              <TableHead className="w-12 px-6 py-3 h-10"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoicesData.map((invoice) => (
+              <TableRow key={invoice.id} className="border-b border-[#E5E5E5] hover:bg-[#F8FAFC]">
+                <TableCell className="px-6 py-3 h-[49px] text-[14px] font-medium text-[#111111] whitespace-nowrap">
+                  {invoice.id}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
+                  {invoice.client}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
+                  {invoice.issueDate}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] text-[14px] text-[#737373] whitespace-nowrap">
+                  {invoice.dueDate}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] text-[14px] font-medium text-[#111111] text-right whitespace-nowrap">
+                  {invoice.amount}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] whitespace-nowrap">
+                  {getStatusBadge(invoice.status)}
+                </TableCell>
+                <TableCell className="px-6 py-3 h-[49px] text-right">
+                  <button className="text-[#A3A3A3] hover:text-[#111111] transition-colors rounded-sm focus:outline-none focus:ring-2 focus:ring-[#0891B2] focus:ring-offset-2">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
+        <p className="text-[14px] text-[#737373]">
+          Showing 1 to 5 of 24 entries
+        </p>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
             Previous
-          </button>
+          </Button>
+
           <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-xs bg-[#F5F5F5] text-[#111111] text-[14px] font-medium transition-colors">
+            <Button variant="outline" className="w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2] rounded-[3px]">
               1
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-xs text-[#737373] hover:bg-[#F5F5F5] hover:text-[#111111] text-[14px] font-medium transition-colors">
+            </Button>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
               2
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-xs text-[#737373] hover:bg-[#F5F5F5] hover:text-[#111111] text-[14px] font-medium transition-colors">
+            </Button>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
               3
-            </button>
-            <span className="w-8 h-8 flex items-center justify-center text-[#737373] text-[14px]">
-              ...
-            </span>
-            <button className="w-8 h-8 flex items-center justify-center rounded-xs text-[#737373] hover:bg-[#F5F5F5] hover:text-[#111111] text-[14px] font-medium transition-colors">
-              8
-            </button>
+            </Button>
+            <span className="text-[#A3A3A3] px-1">...</span>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
+              5
+            </Button>
           </div>
-          <button className="text-[14px] font-medium text-[#737373] hover:text-[#111111] transition-colors px-3 py-1">
+
+          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
             Next
-          </button>
+          </Button>
         </div>
       </div>
+
 
       <AddInvoiceModal isOpen={isAddInvoiceOpen} onClose={() => setIsAddInvoiceOpen(false)} />
     </div>

@@ -3,6 +3,7 @@ import { Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { NewClientButton } from "@/components/dashboard/NewClientButton";
+import { Button } from "@/components/ui/button";
 
 const clientsData = [
   { id: 1, initials: "AC", name: "Acme Corp", industry: "Technology", contact: "Sarah Chen", lastActive: "2 hours ago", status: "Active", ltv: "$45,000" },
@@ -42,85 +43,102 @@ export default function ClientsPage() {
       </div>
 
       {/* Table Container */}
-      <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[10px] flex-1 flex flex-col overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table className="w-full text-left min-w-[1000px]">
-            <TableHeader>
-              <TableRow className="bg-[#F5F5F5] border-b border-[#E5E5E5] hover:bg-[#F5F5F5]">
-                <TableHead className="w-12 px-6 py-3">
+      <div className="bg-white rounded-[10px] border border-[#E5E5E5] overflow-hidden flex flex-col">
+        <Table className="w-full text-left min-w-[1000px]">
+          <TableHeader>
+            <TableRow className="bg-[#F5F5F5] border-b border-[#E5E5E5] hover:bg-[#F5F5F5]">
+              <TableHead className="w-12 px-6 py-3">
+                <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
+              </TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Client</TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Industry</TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Contact</TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Last Active</TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Status</TableHead>
+              <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider text-right">LTV</TableHead>
+              <TableHead className="w-12 px-6 py-3"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {clientsData.map((client, idx) => (
+              <TableRow key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clientsData.length - 1 ? 'border-b border-[#E5E5E5]' : 'border-0'}`}>
+                <TableCell className="px-6 py-4">
                   <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
-                </TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Client</TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Industry</TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Contact</TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Last Active</TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider">Status</TableHead>
-                <TableHead className="px-6 py-3 text-[12px] font-medium text-[#737373] uppercase tracking-wider text-right">LTV</TableHead>
-                <TableHead className="w-12 px-6 py-3"></TableHead>
+                </TableCell>
+                <TableCell className="px-6 py-4">
+                  <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
+                    <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[#0891B2] font-medium text-[12px]">{client.initials}</span>
+                    </div>
+                    <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.name}</span>
+                  </Link>
+                </TableCell>
+                <TableCell className="px-6 py-4">
+                  <span className="text-[#737373] font-normal text-[14px]">{client.industry}</span>
+                </TableCell>
+                <TableCell className="px-6 py-4">
+                  <span className="text-[#737373] font-normal text-[14px]">{client.contact}</span>
+                </TableCell>
+                <TableCell className="px-6 py-4">
+                  <span className="text-[#737373] font-normal text-[14px]">{client.lastActive}</span>
+                </TableCell>
+                <TableCell className="px-6 py-4">
+                  {client.status === "Active" ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#DCFCE7] text-[#166534] font-medium text-[12px]">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#737373] font-medium text-[12px]">
+                      Inactive
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="px-6 py-4 text-right">
+                  <span className="text-[#111111] font-medium text-[14px]">{client.ltv}</span>
+                </TableCell>
+                <TableCell className="px-6 py-4 text-right">
+                  <button className="text-[#737373] hover:text-[#111111] transition-colors">
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clientsData.map((client, idx) => (
-                <TableRow key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clientsData.length - 1 ? 'border-b border-[#E5E5E5]' : 'border-0'}`}>
-                  <TableCell className="px-6 py-4">
-                    <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
-                      <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-[#0891B2] font-medium text-[12px]">{client.initials}</span>
-                      </div>
-                      <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.name}</span>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <span className="text-[#737373] font-normal text-[14px]">{client.industry}</span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <span className="text-[#737373] font-normal text-[14px]">{client.contact}</span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <span className="text-[#737373] font-normal text-[14px]">{client.lastActive}</span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    {client.status === "Active" ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#DCFCE7] text-[#166534] font-medium text-[12px]">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#737373] font-medium text-[12px]">
-                        Inactive
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <span className="text-[#111111] font-medium text-[14px]">{client.ltv}</span>
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-right">
-                    <button className="text-[#737373] hover:text-[#111111] transition-colors">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[#E5E5E5] mt-auto">
-          <span className="text-[#737373] text-[14px] font-normal">1 of 31 pages</span>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center justify-center px-3 h-[32px] bg-[#FFFFFF] border border-[#E5E5E5] rounded-[4px] text-[#A3A3A3] font-medium text-[14px] cursor-not-allowed">
-              Previous
-            </button>
-            <button className="flex items-center justify-center px-3 h-[32px] bg-[#FFFFFF] border border-[#E5E5E5] hover:bg-gray-50 rounded-[4px] text-[#111111] font-medium text-[14px] transition-colors">
-              Next
-            </button>
-          </div>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
+      {/* Pagination Footer */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
+        <p className="text-[14px] text-[#737373]">
+          Showing 1 to 5 of 24 entries
+        </p>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
+            Previous
+          </Button>
+
+          <div className="flex items-center gap-1">
+            <Button variant="outline" className="w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2] rounded-[3px]">
+              1
+            </Button>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
+              2
+            </Button>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
+              3
+            </Button>
+            <span className="text-[#A3A3A3] px-1">...</span>
+            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
+              5
+            </Button>
+          </div>
+
+          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
+
   );
 }
