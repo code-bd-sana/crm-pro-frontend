@@ -1,0 +1,60 @@
+"use client";
+
+import React from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
+
+const data = [
+  { name: "Ryan Cooper", tasks: 24 },
+  { name: "Lisa Anderson", tasks: 28 },
+  { name: "Emily Foster", tasks: 32 },
+  { name: "Marcus Rodriguez", tasks: 35 },
+  { name: "David Kim", tasks: 38 },
+  { name: "Sarah Chen", tasks: 42 },
+];
+
+export function TaskCompletionChart() {
+  return (
+    <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm flex flex-col h-full">
+      <h2 className="text-[14px] font-bold text-[#111111] mb-6">Task Completion by Team Member</h2>
+      <div className="flex-1 w-full min-h-[250px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            layout="vertical"
+            margin={{
+              top: 5,
+              right: 10,
+              left: 30,
+              bottom: 0,
+            }}
+            barSize={12}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E5E5" />
+            <XAxis 
+              type="number"
+              axisLine={true} 
+              tickLine={true} 
+              tick={{ fontSize: 12, fill: "#737373" }} 
+              ticks={[0, 15, 30, 45, 60]}
+              domain={[0, 60]}
+              stroke="#E5E5E5"
+            />
+            <YAxis 
+              dataKey="name" 
+              type="category"
+              axisLine={true} 
+              tickLine={true} 
+              tick={{ fontSize: 12, fill: "#737373" }} 
+              stroke="#E5E5E5"
+            />
+            <Tooltip 
+              cursor={{ fill: "#F5F5F5" }}
+              contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
+            />
+            <Bar dataKey="tasks" fill="#E5E5E5" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}

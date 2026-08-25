@@ -130,10 +130,12 @@ export default function TeamPage() {
           <p className="text-[#737373] text-[14px]">9 team members</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-[36px] px-4 hover:bg-[#F8FAFC] rounded-[3px]">
-            <BarChart2 className="w-4 h-4 mr-2" />
-            Analytics
-          </Button>
+          <Link href="/team/analytics">
+            <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-[36px] px-4 hover:bg-[#F8FAFC] rounded-[3px]">
+              <BarChart2 className="w-4 h-4 mr-2" />
+              Analytics
+            </Button>
+          </Link>
           <Button 
             onClick={() => setIsAddMemberOpen(true)}
             className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors"
