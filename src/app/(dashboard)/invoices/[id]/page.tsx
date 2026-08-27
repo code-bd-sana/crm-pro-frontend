@@ -52,7 +52,7 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
             <Send className="w-4 h-4 mr-2" />
             Send Reminder
           </Button>
-          <Button className="bg-[#4477A1] hover:bg-[#366083] text-white font-medium h-9 px-4 rounded-xs border-0">
+          <Button className="bg-[#0B91B2] hover:bg-[#366083] text-white font-medium h-9 px-4 rounded-xs border-0">
             <Check className="w-4 h-4 mr-2" />
             Mark as Paid
           </Button>
@@ -67,7 +67,7 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
           {/* Company Info */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[4px] bg-[#4477A1] flex items-center justify-center text-white font-bold text-[16px]">
+              <div className="w-10 h-10 rounded-[4px] bg-[#0B91B2] flex items-center justify-center text-white font-bold text-[16px]">
                 CR
               </div>
               <span className="text-[20px] font-bold text-[#111111]">CRM Pro</span>

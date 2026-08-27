@@ -13,7 +13,7 @@ export default function ProfileSettingsPage() {
       <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm">
         <h2 className="text-[14px] font-bold text-[#111111] mb-6">Profile Picture</h2>
         <div className="flex items-center gap-6">
-          <div className="w-[80px] h-[80px] rounded-full bg-[#4477A1] text-white flex items-center justify-center text-[24px] font-semibold shrink-0">
+          <div className="w-[80px] h-[80px] rounded-full bg-[#0891B2] text-white flex items-center justify-center text-[24px] font-semibold shrink-0">
             SC
           </div>
           <div className="flex flex-col gap-3">
@@ -142,7 +142,7 @@ export default function ProfileSettingsPage() {
         <Button variant="outline" className="bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F5F5F5] h-[40px] px-6 rounded-[4px]">
           Cancel
         </Button>
-        <Button className="bg-[#4477A1] hover:bg-[#366083] text-white h-[40px] px-6 rounded-[4px] font-medium">
+        <Button className="bg-[#0891B2] hover:bg-[#366083] text-white h-[40px] px-6 rounded-[4px] font-medium">
           <Save className="w-4 h-4 mr-2" />
           Save Changes
         </Button>

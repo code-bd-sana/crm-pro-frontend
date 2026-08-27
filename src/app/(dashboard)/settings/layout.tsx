@@ -24,7 +24,7 @@ export default function SettingsLayout({
 
   return (
     <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full bg-[#FAFAFA] overflow-y-auto">
-      
+
       {/* Header */}
       <div className="flex flex-col gap-1 mb-2">
         <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Settings</h1>
@@ -32,7 +32,7 @@ export default function SettingsLayout({
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
-        
+
         {/* Left Sidebar Menu */}
         <div className="w-full lg:w-[240px] shrink-0 bg-white border border-[#E5E5E5] rounded-[10px] p-2 flex flex-col gap-1">
           {settingsNav.map((item) => {
@@ -43,10 +43,10 @@ export default function SettingsLayout({
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-[6px] transition-colors text-[14px] font-medium h-[40px]",
+                  "flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-[14px] font-medium h-[40px]",
                   isActive
-                    ? "bg-[#4477A1] text-white"
-                    : "text-[#111111] hover:bg-[#F5F5F5]"
+                    ? "bg-[#0891B2] text-white"
+                    : "text-[#111111] hover:bg-gray-100"
                 )}
               >
                 <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-[#737373]")} />
