@@ -4,7 +4,7 @@ import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 const data = [
-  { name: "Active", value: 58, color: "#4477A1" },
+  { name: "Active", value: 58, color: "#0891B2" },
   { name: "On Hold", value: 15, color: "#D97706" },
   { name: "Completed", value: 27, color: "#65A34E" },
 ];
@@ -13,7 +13,7 @@ export function ProjectStatusChart() {
   return (
     <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm flex flex-col h-full">
       <h2 className="text-[14px] font-bold text-[#111111] mb-6">Project Status Distribution</h2>
-      
+
       <div className="flex-1 w-full min-h-[250px] relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -31,7 +31,7 @@ export function ProjectStatusChart() {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip 
+            <Tooltip
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
               formatter={(value: number) => [`${value}%`, "Share"]}
             />

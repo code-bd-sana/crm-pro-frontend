@@ -49,7 +49,7 @@ export function TopClientsChart() {
             <Tooltip 
               cursor={{ fill: "#F5F5F5" }}
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+              formatter={(value: any) => [`$${value.toLocaleString()}`, "Revenue"]}
             />
             <Bar dataKey="revenue" fill="#4477A1" radius={[0, 4, 4, 0]} />
           </BarChart>

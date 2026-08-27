@@ -48,7 +48,7 @@ export function RevenueChart() {
             <Tooltip 
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
               itemStyle={{ color: "#0284C7", fontWeight: 600 }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+              formatter={(value: any) => [`$${value.toLocaleString()}`, "Revenue"]}
             />
             <Line
               type="monotone"

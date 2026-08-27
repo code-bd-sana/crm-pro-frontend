@@ -39,11 +39,11 @@ export default function TeamMemberDetailsPage({ params }: { params: { id: string
 
   return (
     <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full bg-[#FAFAFA] overflow-y-auto">
-      
+
       {/* Back Link */}
       <div>
-        <Link 
-          href="/team" 
+        <Link
+          href="/team"
           className="inline-flex items-center gap-2 text-[#111111] hover:text-[#0891B2] text-[14px] font-semibold transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -53,10 +53,10 @@ export default function TeamMemberDetailsPage({ params }: { params: { id: string
 
       {/* Main Content Layout */}
       <div className="flex flex-col xl:flex-row gap-6 items-start">
-        
+
         {/* Left Sidebar: Profile Card */}
         <div className="w-full xl:w-[320px] shrink-0 bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm flex flex-col">
-          
+
           {/* Avatar & Header */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-[80px] h-[80px] rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
@@ -89,7 +89,7 @@ export default function TeamMemberDetailsPage({ params }: { params: { id: string
 
           {/* Buttons */}
           <div className="flex flex-col gap-3 mt-auto">
-            <Button className="w-full bg-[#4477A1] hover:bg-[#366083] text-white rounded-[4px] h-9">
+            <Button className="w-full bg-[#0891B2] hover:bg-[#366083] text-white rounded-[4px] h-9">
               <Edit3 className="w-4 h-4 mr-2" />
               Edit Profile
             </Button>
@@ -102,18 +102,17 @@ export default function TeamMemberDetailsPage({ params }: { params: { id: string
 
         {/* Right Content Area */}
         <div className="flex flex-col flex-1 gap-6 w-full min-w-0">
-          
+
           {/* Tabs */}
           <div className="flex items-center gap-2">
             {["Overview", "Tasks", "Projects", "Activity"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-[6px] text-[14px] font-semibold transition-colors ${
-                  activeTab === tab
+                className={`px-3 py-1.5 rounded-[6px] text-[14px] font-semibold transition-colors ${activeTab === tab
                     ? "bg-[#F1F5F9] text-[#111111]"
                     : "text-[#737373] hover:bg-[#F1F5F9]/50 hover:text-[#111111]"
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -187,8 +186,8 @@ export default function TeamMemberDetailsPage({ params }: { params: { id: string
                         <span className="text-[14px] font-bold text-[#111111]">{project.progress}%</span>
                       </div>
                       <div className="w-full bg-[#E0F2FE] h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-[#4477A1] h-full rounded-full" 
+                        <div
+                          className="bg-[#0891B2] h-full rounded-full"
                           style={{ width: `${project.progress}%` }}
                         />
                       </div>
