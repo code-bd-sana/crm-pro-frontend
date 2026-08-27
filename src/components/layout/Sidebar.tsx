@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUIStore } from "@/store/useUIStore";
 import { useRouter } from "next/navigation";
 
 const navigation = [
@@ -38,6 +39,7 @@ const LogoutIcon = () => (
 export default function Sidebar() {
   const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
   const router = useRouter();
 
   const handleLogout = () => {
@@ -46,15 +48,20 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-[240px] h-screen bg-[#FFFFFF] border-r border-[#E5E5E5] flex flex-col flex-shrink-0">
+    <div className={cn(
+      "h-screen bg-[#FFFFFF] border-r border-[#E5E5E5] flex flex-col flex-shrink-0 transition-all duration-300",
+      isSidebarOpen ? "w-[240px]" : "w-[80px]"
+    )}>
       
       {/* Header */}
-      <div className="h-16 px-6 flex items-center border-b border-[#E5E5E5]">
+      <div className={cn("h-16 flex items-center border-b border-[#E5E5E5]", isSidebarOpen ? "px-6" : "px-0 justify-center")}>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#0891B2] rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#0891B2] rounded flex items-center justify-center shrink-0">
             <span className="text-white font-semibold text-sm">CR</span>
           </div>
-          <span className="text-[#111111] font-semibold text-base">CRM Pro</span>
+          {isSidebarOpen && (
+            <span className="text-[#111111] font-semibold text-base whitespace-nowrap">CRM Pro</span>
+          )}
         </div>
       </div>
 
@@ -67,46 +74,65 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              title={!isSidebarOpen ? item.name : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                "flex items-center rounded-md transition-colors",
                 isActive 
                   ? "bg-[#0891B2] text-white" 
-                  : "text-[#111111] hover:bg-gray-100"
+                  : "text-[#111111] hover:bg-gray-100",
+                isSidebarOpen ? "gap-3 px-3 py-2" : "justify-center p-2"
               )}
             >
-              <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-[#737373]")} />
-              <span className="font-medium text-sm">{item.name}</span>
+              <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-white" : "text-[#737373]")} />
+              {isSidebarOpen && (
+                <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
+              )}
             </Link>
           );
         })}
       </div>
 
       {/* User Profile */}
-      <div className="pt-[13px] px-3 pb-4 border-t border-[#E5E5E5]">
-        <div className="flex items-center h-[62px] w-full relative px-3 -mx-3">
+      <div className={cn("pt-[13px] pb-4 border-t border-[#E5E5E5]", isSidebarOpen ? "px-3" : "px-0")}>
+        <div className={cn(
+          "flex items-center h-[62px] w-full relative",
+          isSidebarOpen ? "px-3 -mx-3" : "justify-center flex-col gap-2 h-auto py-2"
+        )}>
           
           <div className="w-10 h-10 rounded-full bg-[#0891B2] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-normal text-base leading-6">SC</span>
           </div>
 
-          <div className="ml-3 flex flex-col items-start flex-1 min-w-0">
-            <p className="text-[#111111] font-medium text-sm leading-5 truncate">
-              Sarah Chen
-            </p>
-            <div className="mt-1 bg-[#F5F5F5] rounded flex justify-center items-center px-2 py-[2px]">
-              <span className="text-[#111111] font-medium text-xs leading-4">
-                Manager
-              </span>
-            </div>
-          </div>
+          {isSidebarOpen ? (
+            <>
+              <div className="ml-3 flex flex-col items-start flex-1 min-w-0">
+                <p className="text-[#111111] font-medium text-sm leading-5 truncate">
+                  Sarah Chen
+                </p>
+                <div className="mt-1 bg-[#F5F5F5] rounded flex justify-center items-center px-2 py-[2px]">
+                  <span className="text-[#111111] font-medium text-xs leading-4">
+                    Manager
+                  </span>
+                </div>
+              </div>
 
-          <button 
-            onClick={handleLogout}
-            className="flex-shrink-0 ml-2 text-[#737373] hover:text-[#111111] transition-colors p-1 rounded hover:bg-gray-100"
-            title="Log out"
-          >
-            <LogoutIcon />
-          </button>
+              <button 
+                onClick={handleLogout}
+                className="flex-shrink-0 ml-2 text-[#737373] hover:text-[#111111] transition-colors p-1 rounded hover:bg-gray-100"
+                title="Log out"
+              >
+                <LogoutIcon />
+              </button>
+            </>
+          ) : (
+            <button 
+              onClick={handleLogout}
+              className="text-[#737373] hover:text-[#111111] transition-colors p-1 rounded hover:bg-gray-100 mt-1"
+              title="Log out"
+            >
+              <LogoutIcon />
+            </button>
+          )}
         </div>
       </div>
 

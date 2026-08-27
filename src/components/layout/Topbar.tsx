@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, Menu } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -8,18 +8,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import NotificationPanel from "./NotificationPanel";
+import { useUIStore } from "@/store/useUIStore";
 
 export default function Topbar() {
+  const toggleSidebar = useUIStore((state) => state.toggleSidebar);
+
   return (
     <div className="h-16 bg-[#FFFFFF] border-b border-[#E5E5E5] flex items-center justify-between px-6 flex-shrink-0">
-      
-      {/* Search */}
-      <div className="w-[448px] relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
-        <Input 
-          placeholder="Search..." 
-          className="w-full pl-9 h-9 border-[#E5E5E5] focus-visible:ring-[#0891B2] bg-[#FFFFFF] text-[#111111] placeholder:text-[#737373]" 
-        />
+
+      {/* Left Section (Menu Toggle + Search) */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={toggleSidebar}
+          className="text-[#737373] hover:text-[#111111] transition-colors p-1 -ml-1 rounded hover:bg-gray-100"
+        >
+          <Menu className="w-7 h-7" />
+        </button>
+
+        <div className="w-[300px] md:w-[448px] relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
+          <Input
+            placeholder="Search..."
+            className="w-full pl-9 h-9 border-[#E5E5E5] focus-visible:ring-[#0891B2] bg-[#FFFFFF] text-[#111111] placeholder:text-[#737373]"
+          />
+        </div>
       </div>
 
       {/* Right Section */}
