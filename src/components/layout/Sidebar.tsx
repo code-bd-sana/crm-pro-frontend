@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUIStore } from "@/store/useUIStore";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const navigation = [
@@ -40,7 +41,24 @@ export default function Sidebar() {
   const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
   const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
+  const closeSidebar = useUIStore((state) => state.closeSidebar);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        closeSidebar();
+      }
+    };
+    
+    // Initial check
+    if (window.innerWidth < 768) {
+      closeSidebar();
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [closeSidebar]);
 
   const handleLogout = () => {
     logout();
@@ -48,10 +66,24 @@ export default function Sidebar() {
   };
 
   return (
-    <div className={cn(
-      "h-screen bg-[#FFFFFF] border-r border-[#E5E5E5] flex flex-col flex-shrink-0 transition-all duration-300",
-      isSidebarOpen ? "w-[240px]" : "w-[80px]"
-    )}>
+    <>
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 z-40 bg-black/50 transition-opacity" 
+          onClick={closeSidebar} 
+        />
+      )}
+
+      <div className={cn(
+        "h-screen bg-[#FFFFFF] border-r border-[#E5E5E5] flex flex-col flex-shrink-0 transition-all duration-300 z-50",
+        // Desktop styles
+        "md:relative md:translate-x-0",
+        isSidebarOpen ? "md:w-[240px]" : "md:w-[80px]",
+        // Mobile styles
+        "fixed inset-y-0 left-0 w-[240px]",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
       
       {/* Header */}
       <div className={cn("h-16 flex items-center border-b border-[#E5E5E5]", isSidebarOpen ? "px-6" : "px-0 justify-center")}>
@@ -137,5 +169,6 @@ export default function Sidebar() {
       </div>
 
     </div>
+    </>
   );
 }

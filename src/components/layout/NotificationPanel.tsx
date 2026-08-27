@@ -92,7 +92,7 @@ export default function NotificationPanel() {
   const [activeTab, setActiveTab] = useState("All");
 
   return (
-    <div className="flex flex-col w-[401px] bg-white rounded-[10px] shadow-lg border border-[#E5E5E5] overflow-hidden max-h-[85vh]">
+    <div className="flex flex-col w-[calc(100vw-32px)] md:w-[401px] max-w-[401px] bg-white rounded-[10px] shadow-lg border border-[#E5E5E5] overflow-hidden max-h-[85vh]">
       {/* Header */}
       <div className="flex flex-col gap-4 p-4 border-b border-[#E5E5E5] shrink-0">
         <div className="flex items-center justify-between">
