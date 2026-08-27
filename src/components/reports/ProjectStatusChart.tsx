@@ -33,7 +33,10 @@ export function ProjectStatusChart() {
             </Pie>
             <Tooltip
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
-              formatter={(value: number) => [`${value}%`, "Share"]}
+              formatter={(value) => {
+                const val = Array.isArray(value) ? value[0] : value;
+                return [`${val}%`, "Share"];
+              }}
             />
           </PieChart>
         </ResponsiveContainer>
