@@ -24,7 +24,7 @@ export function KanbanColumn({ columnId, tasks, onTaskClick }: KanbanColumnProps
   });
 
   return (
-    <div className="flex flex-col flex-1 min-w-[320px] max-w-[400px]">
+    <div className="flex flex-col w-[280px] md:w-[320px] shrink-0 snap-center md:snap-align-none">
       {/* Column Header */}
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-[16px] font-semibold text-[#111111]">{columnId}</h2>

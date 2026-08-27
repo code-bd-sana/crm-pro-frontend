@@ -136,7 +136,7 @@ export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
   };
 
   return (
-    <div className="flex h-full w-full overflow-x-auto gap-6 pb-4">
+    <div className="flex h-full w-full overflow-x-auto gap-4 md:gap-6 pb-4 snap-x snap-mandatory scroll-p-6">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
