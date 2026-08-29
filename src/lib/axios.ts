@@ -1,14 +1,20 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
+// ─── Extend AxiosRequestConfig to track retry attempts ──────────────────────
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
+// ─── Create the main API instance ───────────────────────────────────────────
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request Interceptor
+// ─── Request Interceptor — Attach Bearer Token ───────────────────────────────
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().accessToken;
@@ -17,48 +23,56 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
-// Response Interceptor
+// ─── Response Interceptor — Handle 401 with Token Refresh ───────────────────
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as ExtendedAxiosRequestConfig;
 
+    // Only attempt refresh once per request
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        // Assume refreshToken is securely stored in HttpOnly cookies, 
-        // so the browser automatically sends it, or we handle it if it was in Zustand
-        const res = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, {
-          withCredentials: true // send cookies
-        });
+      const storedRefreshToken = useAuthStore.getState().refreshToken;
 
-        const newAccessToken = res.data.accessToken;
-        
-        // Update store with new token
-        const currentUser = useAuthStore.getState().user;
-        if (currentUser) {
-          useAuthStore.getState().setAuth(currentUser, newAccessToken);
-        }
-
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, logout user
+      if (!storedRefreshToken) {
+        // No refresh token available — force logout
         useAuthStore.getState().logout();
-        
-        // Only redirect if we are on the client side
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
-        
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
+      }
+
+      try {
+        // Use a plain axios call (not the intercepted `api`) to avoid loops
+        const response = await axios.post<{
+          accessToken: string;
+          refreshToken: string;
+        }>(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+          { refreshToken: storedRefreshToken },
+        );
+
+        const { accessToken, refreshToken } = response.data;
+        useAuthStore.getState().setTokens(accessToken, refreshToken);
+
+        // Retry the original request with the new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch {
+        // Refresh also failed — full logout
+        useAuthStore.getState().logout();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );

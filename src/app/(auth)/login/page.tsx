@@ -15,11 +15,12 @@ import {
 } from "@/components/ui/form";
 import Link from "next/link";
 import { useState } from "react";
-import { api } from "@/lib/axios";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { login } from "@/services/auth.service";
+import { AxiosError } from "axios";
 
 // Google SVG Icon for exact Figma matching
 const GoogleIcon = () => (
@@ -36,28 +37,39 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormValues) {
     setIsLoading(true);
     try {
-      const response = await api.post("/auth/login", values);
-      setAuth(response.data.user, response.data.accessToken);
-      toast.success("Successfully logged in!");
-      router.push("/");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to login. Please try again.");
+      const data = await login(values);
+
+      // Persist to Zustand store (survives page reload via localStorage)
+      setAuth(data.user, data.accessToken, data.refreshToken);
+
+      // Mirror the access token in a cookie so Next.js Edge Middleware can read it
+      document.cookie = `access_token=${data.accessToken}; path=/; SameSite=Strict`;
+
+      toast.success(`Welcome back, ${data.user.firstName}!`);
+
+      // Redirect to original destination or dashboard
+      const params = new URLSearchParams(window.location.search);
+      router.push(params.get("from") ?? "/");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ?? "Login failed. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +166,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-[#737373]">
-          Don't have an account? <Link href="/register" className="text-[#111111] font-medium hover:underline">Create Account</Link>
+          Don&apos;t have an account? <Link href="/register" className="text-[#111111] font-medium hover:underline">Create Account</Link>
         </p>
 
       </div>
