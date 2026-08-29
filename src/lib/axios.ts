@@ -36,6 +36,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
+      // Skip 401 interceptor for auth endpoints to allow them to handle their own errors (e.g. invalid credentials)
+      if (
+        originalRequest.url?.includes('/auth/login') ||
+        originalRequest.url?.includes('/auth/register')
+      ) {
+        return Promise.reject(error);
+      }
+
       const storedRefreshToken = useAuthStore.getState().refreshToken;
 
       if (!storedRefreshToken) {

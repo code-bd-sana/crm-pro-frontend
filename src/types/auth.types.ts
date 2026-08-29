@@ -2,16 +2,24 @@
 // Auth & User Types — matching backend response DTOs exactly
 // ============================================================
 
+export interface Role {
+  id: string;
+  name: string;
+}
+
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+}
+
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  /** Derived from firstName + lastName for display */
-  fullName?: string;
-  role: string;
-  department?: string;
-  avatar?: string;
+  isActive: boolean;
+  profile?: UserProfile;
+  roles?: Role[];
 }
 
 export interface LoginPayload {
@@ -26,10 +34,16 @@ export interface RegisterPayload {
   lastName: string;
 }
 
-export interface AuthResponse {
+export interface AuthData {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: AuthData;
 }
 
 export interface RefreshTokenPayload {
