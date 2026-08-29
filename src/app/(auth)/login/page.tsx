@@ -67,9 +67,12 @@ export default function LoginPage() {
       router.push(params.get("from") ?? "/");
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
-      toast.error(
-        axiosError.response?.data?.message ?? "Login failed. Please try again.",
-      );
+      const errorMessage =
+        axiosError.response?.data?.message ?? "Login failed. Please try again.";
+      
+      // Show as a form error
+      form.setError("root", { message: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -133,9 +136,18 @@ export default function LoginPage() {
               )}
             />
 
+            {/* Root Error Message */}
+            {form.formState.errors.root && (
+              <div className="p-3 rounded-md bg-red-50 border border-red-200">
+                <p className="text-sm text-red-600 font-medium text-center">
+                  {form.formState.errors.root.message}
+                </p>
+              </div>
+            )}
+
             <Button 
               type="submit" 
-              className="w-full bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium text-sm h-9"
+              className="w-full bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium text-sm h-9 mt-4"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

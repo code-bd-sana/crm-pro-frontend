@@ -1,10 +1,13 @@
 import { api } from '@/lib/axios';
 import type {
   AuthResponse,
+  ForgotPasswordPayload,
   LoginPayload,
+  MessageResponse,
   RefreshTokenPayload,
   RefreshTokenResponse,
   RegisterPayload,
+  ResetPasswordPayload,
 } from '@/types/auth.types';
 
 /**
@@ -29,4 +32,26 @@ export const refreshToken = (
 ): Promise<RefreshTokenResponse> =>
   api
     .post<RefreshTokenResponse>('/auth/refresh', payload)
+    .then((res) => res.data);
+
+/**
+ * Sends a password-reset email to the provided address.
+ * POST /auth/forgot-password  →  { email }
+ */
+export const forgotPassword = (
+  payload: ForgotPasswordPayload,
+): Promise<MessageResponse> =>
+  api
+    .post<MessageResponse>('/auth/forgot-password', payload)
+    .then((res) => res.data);
+
+/**
+ * Resets the user's password using the token from the email link.
+ * POST /auth/reset-password  →  { token, newPassword }
+ */
+export const resetPassword = (
+  payload: ResetPasswordPayload,
+): Promise<MessageResponse> =>
+  api
+    .post<MessageResponse>('/auth/reset-password', payload)
     .then((res) => res.data);

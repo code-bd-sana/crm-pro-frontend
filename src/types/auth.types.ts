@@ -40,3 +40,17 @@ export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+/** Matches ResetPasswordDto on the backend */
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}
