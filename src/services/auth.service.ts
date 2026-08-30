@@ -9,6 +9,7 @@ import type {
   RefreshTokenResponse,
   RegisterPayload,
   ResetPasswordPayload,
+  User,
 } from '@/types/auth.types';
 
 /**
@@ -23,6 +24,12 @@ export const login = (payload: LoginPayload): Promise<AuthData> =>
  */
 export const register = (payload: RegisterPayload): Promise<AuthData> =>
   api.post<AuthResponse>('/auth/register', payload).then((res) => res.data.data);
+
+/**
+ * Fetches the currently authenticated user's profile.
+ */
+export const getCurrentUser = (): Promise<User> =>
+  api.get<{ success: boolean; data: User }>('/auth/me').then((res) => res.data.data);
 
 /**
  * Uses the stored refreshToken to obtain a new accessToken.

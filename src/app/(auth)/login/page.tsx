@@ -177,14 +177,19 @@ export default function LoginPage() {
         </div>
 
         {/* Social Login */}
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full border-[#E5E5E5] bg-[#FAFAFA] hover:bg-gray-100 text-[#111111] font-medium text-sm h-9"
+        <a 
+          href={`${process.env.NEXT_PUBLIC_API_URL}/auth/google`} 
+          className="w-full block"
         >
-          <GoogleIcon />
-          <span className="ml-2">Continue with Google</span>
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-[#E5E5E5] text-[#111111] font-medium text-sm h-9 hover:bg-[#FAFAFA]"
+          >
+            <GoogleIcon />
+            <span className="ml-2">Continue with Google</span>
+          </Button>
+        </a>
 
         {/* Footer */}
         <p className="mt-6 text-center text-xs text-[#737373]">

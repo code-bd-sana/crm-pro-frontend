@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // ─── Route Classification ─────────────────────────────────────────────────────
-const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
+const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'];
 
 /**
  * Next.js 16 Proxy (formerly Middleware).
