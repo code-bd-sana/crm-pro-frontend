@@ -192,7 +192,9 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full bg-[#FFFFFF] border-[#E5E5E5] h-[36px]">
-                          <SelectValue placeholder={isLoadingDepts ? "Loading..." : "Select department"} />
+                          <SelectValue placeholder={isLoadingDepts ? "Loading..." : "Select department"}>
+                            {field.value ? departments.find(d => d.id === field.value)?.name : null}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -220,7 +222,9 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full bg-[#FFFFFF] border-[#E5E5E5] h-[36px]">
-                          <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"} />
+                          <SelectValue placeholder={isLoadingRoles ? "Loading..." : "Select role"}>
+                            {field.value ? roles.find(r => r.id === field.value)?.name : null}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

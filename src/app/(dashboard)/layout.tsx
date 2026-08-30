@@ -12,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const _hasHydrated = useAuthStore((state) => state._hasHydrated);
 
   // Connect socket once when the authenticated dashboard mounts
   useEffect(() => {
@@ -22,6 +23,15 @@ export default function DashboardLayout({
       socketService.disconnect();
     };
   }, [isAuthenticated]);
+
+  // Global Hydration Guard: Prevents ALL hydration mismatches in the dashboard
+  if (!_hasHydrated) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-[#FAFAFA]">
+        <div className="w-8 h-8 border-4 border-[#0891B2] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-[#FAFAFA] overflow-hidden">
