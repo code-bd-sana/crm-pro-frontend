@@ -14,11 +14,21 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { PermissionEnum } from "@/types/auth.types";
+import { EditTeamMemberModal } from "@/components/team/EditTeamMemberModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { Pencil } from "lucide-react";
 
 export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<any>(null);
 
   const { canManageUsers, hasPermission } = useRBAC();
   const _hasHydrated = useAuthStore((state) => state._hasHydrated);
@@ -169,9 +179,22 @@ export default function TeamPage() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   {canManageUsers && (
-                    <button className="text-[#A3A3A3] hover:text-[#111111] transition-colors focus:outline-none focus:ring-1 focus:ring-[#0891B2] rounded-[3px] p-0.5">
-                      <MoreHorizontal className="w-[18px] h-[18px]" />
-                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="text-[#A3A3A3] hover:text-[#111111] transition-colors focus:outline-none focus:ring-1 focus:ring-[#0891B2] rounded-[3px] p-0.5 inline-flex items-center justify-center">
+                        <MoreHorizontal className="w-[18px] h-[18px]" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <PermissionGuard permission={PermissionEnum.TEAM_UPDATE}>
+                          <DropdownMenuItem 
+                            className="cursor-pointer"
+                            onClick={() => setEditingMember(member)}
+                          >
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit Member
+                          </DropdownMenuItem>
+                        </PermissionGuard>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                   <Badge
                     variant="outline"
@@ -223,6 +246,12 @@ export default function TeamPage() {
       <AddTeamMemberModal
         isOpen={isAddMemberOpen}
         onClose={() => setIsAddMemberOpen(false)}
+      />
+
+      <EditTeamMemberModal 
+        isOpen={!!editingMember}
+        onClose={() => setEditingMember(null)}
+        member={editingMember}
       />
     </div>
   );

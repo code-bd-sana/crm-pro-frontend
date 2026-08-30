@@ -45,3 +45,11 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto extends Partial<CreateUserDto> {}
+
+export interface CreateRoleDto {
+  name: string;
+  description?: string;
+  permissionIds: string[];
+}
+
+export interface UpdateRoleDto extends Partial<CreateRoleDto> {}

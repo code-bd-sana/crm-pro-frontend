@@ -33,6 +33,8 @@ export enum PermissionEnum {
 
   TEAM_READ = 'team.read',
   TEAM_CREATE = 'team.create',
+  TEAM_UPDATE = 'team.update',
+  TEAM_DELETE = 'team.delete',
 
   DEPARTMENTS_READ = 'departments.read',
   DEPARTMENTS_CREATE = 'departments.create',
