@@ -20,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { useRBAC } from "@/hooks/useRBAC";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -35,6 +37,15 @@ export default function ProfileSettingsPage() {
   const queryClient = useQueryClient();
   const setAuth = useAuthStore((state) => state.setAuth);
   const authState = useAuthStore((state) => state);
+  const _hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const router = useRouter();
+  const { canManageUsers } = useRBAC();
+
+  useEffect(() => {
+    if (_hasHydrated && !canManageUsers) {
+      router.push("/unauthorized");
+    }
+  }, [canManageUsers, _hasHydrated, router]);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],

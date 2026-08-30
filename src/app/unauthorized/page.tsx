@@ -37,15 +37,13 @@ export default function UnauthorizedPage() {
             Go Back
           </Button>
 
-          <Button
-            className="w-full sm:w-[180px] bg-[#0891B2] hover:bg-[#0E7490] text-white h-[44px] rounded-[6px] font-medium transition-colors shadow-sm"
-            asChild
+          <Link 
+            href="/" 
+            className="flex items-center justify-center whitespace-nowrap w-full sm:w-[180px] bg-[#0891B2] hover:bg-[#0E7490] text-white h-[44px] rounded-[6px] font-medium transition-colors shadow-sm"
           >
-            <Link href="/" className="flex items-center justify-center whitespace-nowrap">
-              <Home className="w-4 h-4 mr-2 shrink-0" />
-              Back to Dashboard
-            </Link>
-          </Button>
+            <Home className="w-4 h-4 mr-2 shrink-0" />
+            Back to Dashboard
+          </Link>
         </div>
       </div>
     </div>

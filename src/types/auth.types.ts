@@ -2,9 +2,17 @@
 // Auth & User Types — matching backend response DTOs exactly
 // ============================================================
 
+export enum SystemRoles {
+  SUPER_ADMIN = 'Super Admin',
+  ADMIN = 'Admin',
+  MANAGER = 'Manager',
+  STAFF = 'Staff',
+  CLIENT = 'Client',
+}
+
 export interface Role {
   id: string;
-  name: string;
+  name: SystemRoles | string;
 }
 
 export interface UserProfile {

@@ -39,6 +39,7 @@ const LogoutIcon = () => (
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
   const closeSidebar = useUIStore((state) => state.closeSidebar);
@@ -134,18 +135,20 @@ export default function Sidebar() {
         )}>
           
           <div className="w-10 h-10 rounded-full bg-[#0891B2] flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-normal text-base leading-6">SC</span>
+            <span className="text-white font-normal text-base leading-6">
+              {`${user?.profile?.firstName?.charAt(0) || ''}${user?.profile?.lastName?.charAt(0) || ''}`.toUpperCase() || 'U'}
+            </span>
           </div>
 
           {isSidebarOpen ? (
             <>
               <div className="ml-3 flex flex-col items-start flex-1 min-w-0">
-                <p className="text-[#111111] font-medium text-sm leading-5 truncate">
-                  Sarah Chen
+                <p className="text-[#111111] font-medium text-sm leading-5 truncate w-full text-left" title={`${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`}>
+                  {user?.profile?.firstName} {user?.profile?.lastName}
                 </p>
-                <div className="mt-1 bg-[#F5F5F5] rounded flex justify-center items-center px-2 py-[2px]">
-                  <span className="text-[#111111] font-medium text-xs leading-4">
-                    Manager
+                <div className="mt-1 bg-[#F5F5F5] rounded flex justify-center items-center px-2 py-[2px] max-w-full">
+                  <span className="text-[#111111] font-medium text-xs leading-4 truncate">
+                    {user?.roles?.[0]?.name || 'User'}
                   </span>
                 </div>
               </div>

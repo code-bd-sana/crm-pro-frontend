@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
 import { Search, Filter, Plus, MoreHorizontal, Mail, Phone, BarChart2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -11,13 +10,24 @@ import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "@/services/user.service";
 import { useRBAC } from "@/hooks/useRBAC";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
-  
+
   const { canManageUsers } = useRBAC();
+  const _hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (_hasHydrated && !canManageUsers) {
+      router.push("/unauthorized");
+    }
+  }, [canManageUsers, _hasHydrated, router]);
 
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
@@ -25,13 +35,13 @@ export default function TeamPage() {
   });
 
   const filteredTeam = users?.filter((member) => {
-    const matchesSearch = 
+    const matchesSearch =
       (member.profile?.firstName + " " + member.profile?.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.roles?.some(role => role.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      
+
     const matchesTab = activeTab === "All" || member.roles?.some(role => role.name === activeTab.toUpperCase());
-    
+
     return matchesSearch && matchesTab;
   }) || [];
 
@@ -55,7 +65,7 @@ export default function TeamPage() {
             </Button>
           </Link>
           {canManageUsers && (
-            <Button 
+            <Button
               onClick={() => setIsAddMemberOpen(true)}
               className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors"
             >
@@ -92,11 +102,10 @@ export default function TeamPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-[14px] font-medium transition-colors relative ${
-              activeTab === tab
+            className={`pb-2 text-[14px] font-medium transition-colors relative ${activeTab === tab
                 ? "text-[#111111]"
                 : "text-[#737373] hover:text-[#111111]"
-            }`}
+              }`}
           >
             {tab}
             {activeTab === tab && (
@@ -144,8 +153,8 @@ export default function TeamPage() {
                     {getInitials(member.profile?.firstName, member.profile?.lastName)}
                   </div>
                   <div className="flex flex-col">
-                    <Link 
-                      href={`/team/${member.id}`} 
+                    <Link
+                      href={`/team/${member.id}`}
                       className="text-[16px] font-bold text-[#111111] hover:text-[#0891B2] hover:underline transition-colors"
                     >
                       {member.profile?.firstName} {member.profile?.lastName}
@@ -165,11 +174,10 @@ export default function TeamPage() {
                   )}
                   <Badge
                     variant="outline"
-                    className={`font-medium px-2 py-0.5 rounded-[4px] text-[11px] border ${
-                      member.isActive
+                    className={`font-medium px-2 py-0.5 rounded-[4px] text-[11px] border ${member.isActive
                         ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
                         : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
-                    }`}
+                      }`}
                   >
                     {member.isActive ? "Active" : "Inactive"}
                   </Badge>
@@ -211,9 +219,9 @@ export default function TeamPage() {
         )}
       </div>
 
-      <AddTeamMemberModal 
-        isOpen={isAddMemberOpen} 
-        onClose={() => setIsAddMemberOpen(false)} 
+      <AddTeamMemberModal
+        isOpen={isAddMemberOpen}
+        onClose={() => setIsAddMemberOpen(false)}
       />
     </div>
   );
