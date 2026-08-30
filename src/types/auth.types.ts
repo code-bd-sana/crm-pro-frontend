@@ -18,6 +18,10 @@ export interface User {
   id: string;
   email: string;
   isActive: boolean;
+  phone?: string;
+  jobTitle?: string;
+  departmentId?: string;
+  department?: { id: string; name: string };
   profile?: UserProfile;
   roles?: Role[];
 }
