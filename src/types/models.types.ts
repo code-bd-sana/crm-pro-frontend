@@ -53,3 +53,11 @@ export interface CreateRoleDto {
 }
 
 export interface UpdateRoleDto extends Partial<CreateRoleDto> {}
+
+export interface CreateDepartmentDto {
+  name: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateDepartmentDto extends Partial<CreateDepartmentDto> {}

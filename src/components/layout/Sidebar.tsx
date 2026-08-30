@@ -10,7 +10,8 @@ import {
   FileText, 
   UsersRound, 
   BarChart2, 
-  Settings
+  Settings,
+  Building
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -25,6 +26,7 @@ const navigation = [
   { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Invoices", href: "/invoices", icon: FileText },
   { name: "Team", href: "/team", icon: UsersRound },
+  { name: "Departments", href: "/departments", icon: Building },
   { name: "Reports", href: "/reports", icon: BarChart2 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
