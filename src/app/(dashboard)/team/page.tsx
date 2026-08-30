@@ -13,21 +13,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { PermissionEnum } from "@/types/auth.types";
 
 export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
 
-  const { canManageUsers } = useRBAC();
+  const { canManageUsers, hasPermission } = useRBAC();
   const _hasHydrated = useAuthStore((state) => state._hasHydrated);
   const router = useRouter();
 
   useEffect(() => {
-    if (_hasHydrated && !canManageUsers) {
+    if (_hasHydrated && !hasPermission(PermissionEnum.TEAM_READ)) {
       router.push("/unauthorized");
     }
-  }, [canManageUsers, _hasHydrated, router]);
+  }, [hasPermission, _hasHydrated, router]);
 
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],

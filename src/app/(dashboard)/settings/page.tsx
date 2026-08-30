@@ -39,13 +39,15 @@ export default function ProfileSettingsPage() {
   const authState = useAuthStore((state) => state);
   const _hasHydrated = useAuthStore((state) => state._hasHydrated);
   const router = useRouter();
-  const { canManageUsers } = useRBAC();
+  const { hasRole } = useRBAC();
 
   useEffect(() => {
-    if (_hasHydrated && !canManageUsers) {
+    // Basic settings are usually open to all, but since specifically requested:
+    // Only allowing Super Admins to access settings for now.
+    if (_hasHydrated && !hasRole('Super Admin')) {
       router.push("/unauthorized");
     }
-  }, [canManageUsers, _hasHydrated, router]);
+  }, [hasRole, _hasHydrated, router]);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],

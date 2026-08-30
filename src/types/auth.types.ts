@@ -10,9 +10,60 @@ export enum SystemRoles {
   CLIENT = 'Client',
 }
 
+export enum PermissionEnum {
+  CLIENTS_READ = 'clients.read',
+  CLIENTS_CREATE = 'clients.create',
+  CLIENTS_UPDATE = 'clients.update',
+  CLIENTS_DELETE = 'clients.delete',
+
+  PROJECTS_READ = 'projects.read',
+  PROJECTS_CREATE = 'projects.create',
+  PROJECTS_UPDATE = 'projects.update',
+  PROJECTS_DELETE = 'projects.delete',
+
+  TASKS_READ = 'tasks.read',
+  TASKS_CREATE = 'tasks.create',
+  TASKS_UPDATE = 'tasks.update',
+  TASKS_DELETE = 'tasks.delete',
+
+  INVOICES_READ = 'invoices.read',
+  INVOICES_CREATE = 'invoices.create',
+  INVOICES_UPDATE = 'invoices.update',
+  INVOICES_DELETE = 'invoices.delete',
+
+  TEAM_READ = 'team.read',
+  TEAM_CREATE = 'team.create',
+
+  DEPARTMENTS_READ = 'departments.read',
+  DEPARTMENTS_CREATE = 'departments.create',
+  DEPARTMENTS_UPDATE = 'departments.update',
+  DEPARTMENTS_DELETE = 'departments.delete',
+
+  REPORTS_READ = 'reports.read',
+  REPORTS_EXPORT = 'reports.export',
+
+  DASHBOARD_READ = 'dashboard.read',
+
+  SETTINGS_READ = 'settings.read',
+  SETTINGS_UPDATE = 'settings.update',
+
+  ROLES_READ = 'roles.read',
+  ROLES_CREATE = 'roles.create',
+  ROLES_UPDATE = 'roles.update',
+  ROLES_DELETE = 'roles.delete',
+}
+
+export interface Permission {
+  id: string;
+  slug: string;
+  module: string;
+  description?: string;
+}
+
 export interface Role {
   id: string;
   name: SystemRoles | string;
+  permissions?: Permission[];
 }
 
 export interface UserProfile {
