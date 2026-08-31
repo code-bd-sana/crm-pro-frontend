@@ -100,84 +100,140 @@ export default function DepartmentsPage() {
         </div>
       </div>
 
-      {/* Grid Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-10">
-        {isLoading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-[180px] w-full rounded-[10px]" />
-          ))
-        ) : filteredDepartments.length === 0 ? (
-          <div className="col-span-full py-16 text-center text-[#737373]">
-            No departments found matching "{searchQuery}"
-          </div>
-        ) : (
-          filteredDepartments.map((dept) => (
-            <div
-              key={dept.id}
-              className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[10px] p-6 flex flex-col shadow-sm hover:border-[#0891B2] transition-colors group"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-[42px] h-[42px] rounded-[8px] bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center">
-                    <Building2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-[16px] font-bold text-[#111111] group-hover:text-[#0891B2] transition-colors">
-                      {dept.name}
-                    </h3>
-                    <Badge
-                      variant="outline"
-                      className={`font-medium px-2 py-0.5 rounded-[4px] text-[11px] border mt-1 inline-block ${
-                        dept.isActive
-                          ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
-                          : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
-                      }`}
+      {/* Table Content */}
+      <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[8px] overflow-hidden flex flex-col">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#F9FAFB] border-b border-[#E5E5E5] text-[12px] font-semibold text-[#737373] tracking-wider uppercase">
+                <th className="px-6 py-4 w-[50px]">
+                  <input type="checkbox" className="rounded-[4px] border-[#D4D4D8] text-[#0891B2] focus:ring-[#0891B2]" />
+                </th>
+                <th className="px-6 py-4">Department</th>
+                <th className="px-6 py-4 hidden md:table-cell">Description</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 hidden sm:table-cell">Created</th>
+                <th className="px-6 py-4 text-right"></th>
+              </tr>
+            </thead>
+            <tbody className="text-[14px] text-[#111111]">
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-[#E5E5E5]">
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-4" /></td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-[36px] w-[36px] rounded-full" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell"><Skeleton className="h-4 w-48" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-6 w-16 rounded-full" /></td>
+                    <td className="px-6 py-4 hidden sm:table-cell"><Skeleton className="h-4 w-24" /></td>
+                    <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 ml-auto" /></td>
+                  </tr>
+                ))
+              ) : filteredDepartments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center text-[#737373]">
+                    No departments found matching "{searchQuery}"
+                  </td>
+                </tr>
+              ) : (
+                filteredDepartments.map((dept) => {
+                  // Generate an acronym for the avatar (e.g. "Human Resources" -> "HR")
+                  const initials = dept.name
+                    .split(' ')
+                    .map(word => word[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+
+                  return (
+                    <tr 
+                      key={dept.id} 
+                      className="border-b border-[#E5E5E5] hover:bg-[#F9FAFB] transition-colors group"
                     >
-                      {dept.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="text-[#A3A3A3] hover:text-[#111111] transition-colors focus:outline-none focus:ring-1 focus:ring-[#0891B2] rounded-[3px] p-0.5 inline-flex items-center justify-center">
-                      <MoreHorizontal className="w-[18px] h-[18px]" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[160px]">
-                      <PermissionGuard permission={PermissionEnum.DEPARTMENTS_UPDATE}>
-                        <DropdownMenuItem 
-                          className="cursor-pointer"
-                          onClick={() => handleEdit(dept)}
+                      <td className="px-6 py-4">
+                        <input type="checkbox" className="rounded-[4px] border-[#D4D4D8] text-[#0891B2] focus:ring-[#0891B2]" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-[36px] h-[36px] rounded-full bg-[#F0F9FF] border border-[#BAE6FD] text-[#0284C7] flex items-center justify-center font-medium text-[13px]">
+                            {initials}
+                          </div>
+                          <span className="font-semibold text-[#111111]">{dept.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 hidden md:table-cell text-[#525252] max-w-[300px] truncate">
+                        {dept.description || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge
+                          variant="outline"
+                          className={`font-medium px-2.5 py-0.5 rounded-[4px] text-[12px] border ${
+                            dept.isActive
+                              ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
+                              : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
+                          }`}
                         >
-                          <Pencil className="w-4 h-4 mr-2" />
-                          Edit Department
-                        </DropdownMenuItem>
-                      </PermissionGuard>
-                      <PermissionGuard permission={PermissionEnum.DEPARTMENTS_DELETE}>
-                        <DropdownMenuItem 
-                          className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                          onClick={() => handleDelete(dept.id)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </PermissionGuard>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
+                          {dept.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 hidden sm:table-cell text-[#525252]">
+                        {new Date(dept.createdAt).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="text-[#A3A3A3] hover:text-[#111111] transition-colors focus:outline-none rounded-[4px] p-1.5 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100">
+                            <MoreHorizontal className="w-[18px] h-[18px]" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[160px]">
+                            <PermissionGuard permission={PermissionEnum.DEPARTMENTS_UPDATE}>
+                              <DropdownMenuItem 
+                                className="cursor-pointer"
+                                onClick={() => handleEdit(dept)}
+                              >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Edit Department
+                              </DropdownMenuItem>
+                            </PermissionGuard>
+                            <PermissionGuard permission={PermissionEnum.DEPARTMENTS_DELETE}>
+                              <DropdownMenuItem 
+                                className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                onClick={() => handleDelete(dept.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </PermissionGuard>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
 
-              <div className="flex-1 mt-2">
-                <p className="text-[#525252] text-[14px] line-clamp-3 leading-relaxed">
-                  {dept.description || "No description provided."}
-                </p>
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-[#FAFAFA] flex items-center justify-between text-[12px] text-[#A3A3A3]">
-                <span>Created: {new Date(dept.createdAt).toLocaleDateString()}</span>
-              </div>
+        {/* Footer Pagination (Visual Only) */}
+        {!isLoading && filteredDepartments.length > 0 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-[#E5E5E5] bg-white">
+            <div className="text-[13px] text-[#737373]">
+              Showing 1 to {filteredDepartments.length} of {departments.length} entries
             </div>
-          ))
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[13px] border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F9FAFB] hover:text-[#111111]">Previous</Button>
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-[13px] border-[#0891B2] bg-[#0891B2] text-white hover:bg-[#0E7490] hover:text-white">1</Button>
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[13px] border-[#E5E5E5] bg-white text-[#525252] hover:bg-[#F9FAFB] hover:text-[#111111]">Next</Button>
+            </div>
+          </div>
         )}
       </div>
 

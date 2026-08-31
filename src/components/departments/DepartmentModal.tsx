@@ -31,7 +31,7 @@ import type { Department } from "@/types/models.types";
 const departmentSchema = z.object({
   name: z.string().min(2, "Department name is required"),
   description: z.string().optional(),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 type DepartmentFormValues = z.infer<typeof departmentSchema>;

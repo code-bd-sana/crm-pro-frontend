@@ -26,7 +26,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createRole, updateRole } from "@/services/role.service";
+import { getCurrentUser } from "@/services/auth.service";
+import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/lib/axios";
+import type { Role } from "@/types/auth.types";
 import type { Permission } from "@/types/auth.types";
 
 const roleSchema = z.object({
@@ -45,6 +48,7 @@ interface RoleModalProps {
 
 export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
   const queryClient = useQueryClient();
+  const updateUser = useAuthStore(state => state.updateUser);
   const isEditing = !!roleToEdit;
 
   // Fetch all available permissions to build the checklist
@@ -90,9 +94,18 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
       }
       return createRole(values);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       toast.success(`Role ${isEditing ? 'updated' : 'created'} successfully`);
+
+      // Auto-refresh the current user's profile in case their own role was updated
+      try {
+        const currentUser = await getCurrentUser();
+        updateUser(currentUser);
+      } catch (e) {
+        console.error("Failed to refresh user profile", e);
+      }
+
       onClose();
     },
     onError: (error: any) => {
@@ -126,7 +139,7 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6 max-h-[75vh] overflow-y-auto px-6 py-6">
-            
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -135,11 +148,11 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
                   <FormItem>
                     <FormLabel className="text-[14px] font-medium text-[#111111]">Role Name</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="e.g., HR Manager" 
-                        className="bg-[#FFFFFF] border-[#E5E5E5] h-[36px]" 
+                      <Input
+                        placeholder="e.g., HR Manager"
+                        className="bg-[#FFFFFF] border-[#E5E5E5] h-[36px]"
                         disabled={isEditing && roleToEdit?.isSystem}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -163,7 +176,7 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
 
             <div>
               <h3 className="text-[16px] font-semibold text-[#111111] mb-4">Permissions</h3>
-              
+
               {isLoadingPerms ? (
                 <div className="flex items-center justify-center p-8">
                   <Loader2 className="w-6 h-6 animate-spin text-[#0891B2]" />
@@ -198,10 +211,10 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
                                         return checked
                                           ? field.onChange([...field.value, perm.id])
                                           : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== perm.id
-                                              )
+                                            field.value?.filter(
+                                              (value) => value !== perm.id
                                             )
+                                          )
                                       }}
                                     />
                                   </FormControl>

@@ -12,6 +12,7 @@ interface AuthState {
   // Actions
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
   setHasHydrated: (state: boolean) => void;
   // RBAC Helpers
@@ -47,6 +48,14 @@ export const useAuthStore = create<AuthState>()(
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
 
+      updateUser: (user) => {
+        const perms = new Set<string>();
+        user.roles?.forEach(role => {
+          role.permissions?.forEach(p => perms.add(p.slug));
+        });
+        set({ user, permissions: Array.from(perms) });
+      },
+
       logout: () =>
         set({
           user: null,
@@ -59,8 +68,7 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       hasPermission: (slug: string) => {
-        const { user, permissions } = get();
-        if (user?.roles?.some(r => r.name === 'Super Admin')) return true;
+        const { permissions } = get();
         return permissions.includes(slug);
       },
 
