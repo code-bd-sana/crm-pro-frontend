@@ -12,7 +12,6 @@ interface AuthState {
   // Actions
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
-  updateUser: (user: User) => void;
   logout: () => void;
   setHasHydrated: (state: boolean) => void;
   // RBAC Helpers
@@ -47,14 +46,6 @@ export const useAuthStore = create<AuthState>()(
 
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
-
-      updateUser: (user) => {
-        const perms = new Set<string>();
-        user.roles?.forEach(role => {
-          role.permissions?.forEach(p => perms.add(p.slug));
-        });
-        set({ user, permissions: Array.from(perms) });
-      },
 
       logout: () =>
         set({

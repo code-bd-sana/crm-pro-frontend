@@ -26,8 +26,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createRole, updateRole } from "@/services/role.service";
-import { getCurrentUser } from "@/services/auth.service";
-import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/lib/axios";
 import type { Role } from "@/types/auth.types";
 import type { Permission } from "@/types/auth.types";
@@ -48,7 +46,6 @@ interface RoleModalProps {
 
 export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
   const queryClient = useQueryClient();
-  const updateUser = useAuthStore(state => state.updateUser);
   const isEditing = !!roleToEdit;
 
   // Fetch all available permissions to build the checklist
@@ -94,18 +91,9 @@ export function RoleModal({ isOpen, onClose, roleToEdit }: RoleModalProps) {
       }
       return createRole(values);
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       toast.success(`Role ${isEditing ? 'updated' : 'created'} successfully`);
-
-      // Auto-refresh the current user's profile in case their own role was updated
-      try {
-        const currentUser = await getCurrentUser();
-        updateUser(currentUser);
-      } catch (e) {
-        console.error("Failed to refresh user profile", e);
-      }
-
       onClose();
     },
     onError: (error: any) => {
