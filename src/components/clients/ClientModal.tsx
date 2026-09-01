@@ -127,7 +127,7 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[850px] p-0 overflow-hidden bg-[#FAFAFA] border-[#E5E5E5] shadow-md rounded-[6px]">
+      <DialogContent className="sm:max-w-[850px] max-w-[95vw] p-0 overflow-hidden bg-[#FAFAFA] border-[#E5E5E5] shadow-md rounded-[6px]">
         <div className="px-6 pt-6 pb-4 border-b border-[#E5E5E5]">
           <DialogHeader>
             <DialogTitle className="text-[#111111] font-semibold text-[18px]">

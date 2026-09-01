@@ -11,10 +11,13 @@ import type {
 const BASE_PATH = '/clients';
 
 export const getClients = async (query?: QueryClientDto): Promise<PaginatedResponse<Client>> => {
-  const response = await api.get<{ success: boolean; data: PaginatedResponse<Client> }>(BASE_PATH, {
+  const response = await api.get<PaginatedResponse<Client> & { success: boolean; message?: string }>(BASE_PATH, {
     params: query
   });
-  return response.data.data;
+  return {
+    data: response.data.data,
+    meta: response.data.meta
+  };
 };
 
 export const getClientById = async (id: string): Promise<Client> => {
