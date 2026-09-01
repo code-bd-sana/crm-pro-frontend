@@ -1,125 +1,64 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
 import { Search, Filter, Plus, MoreHorizontal, Mail, Phone, BarChart2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AddTeamMemberModal } from "@/components/team/AddTeamMemberModal";
-
-const teamData = [
-  {
-    id: "1",
-    name: "Sarah Chen",
-    role: "Design",
-    type: "Manager",
-    status: "Active",
-    email: "sarah.chen@crmpro.com",
-    phone: "+1 (555) 123-4567",
-    stats: { active: 8, done: 42, projects: 3 },
-    initials: "SC",
-  },
-  {
-    id: "2",
-    name: "David Kim",
-    role: "Engineering",
-    type: "Staff",
-    status: "Active",
-    email: "david.kim@crmpro.com",
-    phone: "+1 (555) 234-5678",
-    stats: { active: 6, done: 38, projects: 2 },
-    initials: "DK",
-  },
-  {
-    id: "3",
-    name: "Marcus Rodriguez",
-    role: "Sales",
-    type: "Manager",
-    status: "Active",
-    email: "marcus.r@crmpro.com",
-    phone: "+1 (555) 345-6789",
-    stats: { active: 5, done: 35, projects: 4 },
-    initials: "MR",
-  },
-  {
-    id: "4",
-    name: "Emily Foster",
-    role: "Marketing",
-    type: "Staff",
-    status: "Active",
-    email: "emily.foster@crmpro.com",
-    phone: "+1 (555) 456-7890",
-    stats: { active: 7, done: 32, projects: 2 },
-    initials: "EF",
-  },
-  {
-    id: "5",
-    name: "Lisa Anderson",
-    role: "Design",
-    type: "Staff",
-    status: "Active",
-    email: "lisa.anderson@crmpro.com",
-    phone: "+1 (555) 567-8901",
-    stats: { active: 4, done: 28, projects: 2 },
-    initials: "LA",
-  },
-  {
-    id: "6",
-    name: "Ryan Cooper",
-    role: "Engineering",
-    type: "Staff",
-    status: "Active",
-    email: "ryan.cooper@crmpro.com",
-    phone: "+1 (555) 678-9012",
-    stats: { active: 6, done: 24, projects: 3 },
-    initials: "RC",
-  },
-  {
-    id: "7",
-    name: "Jessica Walsh",
-    role: "Marketing",
-    type: "Manager",
-    status: "Active",
-    email: "jessica.w@crmpro.com",
-    phone: "+1 (555) 789-0123",
-    stats: { active: 3, done: 29, projects: 2 },
-    initials: "JW",
-  },
-  {
-    id: "8",
-    name: "Michael Torres",
-    role: "Sales",
-    type: "Staff",
-    status: "Away",
-    email: "michael.t@crmpro.com",
-    phone: "+1 (555) 890-1234",
-    stats: { active: 2, done: 31, projects: 1 },
-    initials: "MT",
-  },
-  {
-    id: "9",
-    name: "Amanda Brooks",
-    role: "Engineering",
-    type: "Staff",
-    status: "Active",
-    email: "amanda.b@crmpro.com",
-    phone: "+1 (555) 901-2345",
-    stats: { active: 5, done: 27, projects: 2 },
-    initials: "AB",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getUsers } from "@/services/user.service";
+import { useRBAC } from "@/hooks/useRBAC";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { PermissionEnum } from "@/types/auth.types";
+import { EditTeamMemberModal } from "@/components/team/EditTeamMemberModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { Pencil } from "lucide-react";
 
 export default function TeamPage() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<any>(null);
 
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const { canManageUsers, hasPermission } = useRBAC();
+  const _hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const router = useRouter();
 
-  if (!isMounted) return null;
+  useEffect(() => {
+    if (_hasHydrated && !hasPermission(PermissionEnum.TEAM_READ)) {
+      router.push("/unauthorized");
+    }
+  }, [hasPermission, _hasHydrated, router]);
+
+  const { data: users, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+  });
+
+  const filteredTeam = users?.filter((member) => {
+    const matchesSearch =
+      (member.profile?.firstName + " " + member.profile?.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.roles?.some(role => role.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesTab = activeTab === "All" || member.roles?.some(role => role.name === activeTab.toUpperCase());
+
+    return matchesSearch && matchesTab;
+  }) || [];
+
+  const getInitials = (firstName?: string, lastName?: string) => {
+    return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase() || 'U';
+  };
 
   return (
     <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full bg-[#FAFAFA] overflow-y-auto">
@@ -127,7 +66,7 @@ export default function TeamPage() {
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Team</h1>
-          <p className="text-[#737373] text-[14px]">9 team members</p>
+          <p className="text-[#737373] text-[14px]">{users?.length || 0} team members</p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/team/analytics">
@@ -136,13 +75,15 @@ export default function TeamPage() {
               Analytics
             </Button>
           </Link>
-          <Button 
-            onClick={() => setIsAddMemberOpen(true)}
-            className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="font-medium text-[14px]">Add Team Member</span>
-          </Button>
+          {canManageUsers && (
+            <Button
+              onClick={() => setIsAddMemberOpen(true)}
+              className="bg-[#0891B2] hover:bg-[#0E7490] text-white rounded-[3px] h-[36px] px-4 transition-colors"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="font-medium text-[14px]">Add Team Member</span>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -153,6 +94,8 @@ export default function TeamPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
           <Input
             placeholder="Search team members..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 h-9 border-[#E5E5E5] focus-visible:ring-[#0891B2] bg-[#FFFFFF] text-[#111111] placeholder:text-[#737373] rounded-[3px]"
           />
         </div>
@@ -170,11 +113,10 @@ export default function TeamPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-[14px] font-medium transition-colors relative ${
-              activeTab === tab
+            className={`pb-2 text-[14px] font-medium transition-colors relative ${activeTab === tab
                 ? "text-[#111111]"
                 : "text-[#737373] hover:text-[#111111]"
-            }`}
+              }`}
           >
             {tab}
             {activeTab === tab && (
@@ -186,90 +128,131 @@ export default function TeamPage() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {teamData.map((member) => (
-          <div
-            key={member.id}
-            className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[10px] p-6 flex flex-col shadow-sm"
-          >
-            {/* Card Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-[42px] h-[42px] rounded-full bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center font-medium text-[16px]">
-                  {member.initials}
-                </div>
-                <div className="flex flex-col">
-                  <Link 
-                    href={`/team/${member.id}`} 
-                    className="text-[16px] font-bold text-[#111111] hover:text-[#0891B2] hover:underline transition-colors"
-                  >
-                    {member.name}
-                  </Link>
-                  <span className="text-[14px] text-[#737373]">
-                    {member.role}
-                  </span>
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 flex flex-col shadow-sm">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-[42px] h-[42px] rounded-full" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="w-16 h-3" />
+                  </div>
                 </div>
               </div>
-              <button className="text-[#A3A3A3] hover:text-[#111111] transition-colors mt-1">
-                <MoreHorizontal className="w-5 h-5" />
-              </button>
+              <Skeleton className="w-full h-10 mt-4" />
             </div>
-
-            {/* Badges */}
-            <div className="flex items-center justify-between mb-5">
-              {member.type === "Manager" ? (
-                <Badge className="bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-transparent font-medium rounded-[3px] shadow-none h-6 px-2">
-                  Manager
-                </Badge>
-              ) : (
-                <Badge className="bg-[#F1F5F9] text-[#475569] hover:bg-[#F1F5F9] border-transparent font-medium rounded-[3px] shadow-none h-6 px-2">
-                  Staff
-                </Badge>
-              )}
-              <span className="text-[14px] font-medium text-[#111111]">
-                {member.status}
-              </span>
-            </div>
-
-            {/* Contact Info */}
-            <div className="flex flex-col gap-3 mb-6">
-              <div className="flex items-center gap-2 text-[#737373]">
-                <Mail className="w-4 h-4" />
-                <span className="text-[14px]">{member.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-[#737373]">
-                <Phone className="w-4 h-4" />
-                <span className="text-[14px]">{member.phone}</span>
-              </div>
-            </div>
-
-            <div className="border-t border-[#E5E5E5] -mx-6 mb-4"></div>
-
-            {/* Stats */}
-            <div className="flex items-center justify-between text-center px-4">
-              <div className="flex flex-col">
-                <span className="text-[18px] font-bold text-[#111111]">
-                  {member.stats.active}
-                </span>
-                <span className="text-[12px] text-[#737373]">Active</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[18px] font-bold text-[#111111]">
-                  {member.stats.done}
-                </span>
-                <span className="text-[12px] text-[#737373]">Done</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[18px] font-bold text-[#111111]">
-                  {member.stats.projects}
-                </span>
-                <span className="text-[12px] text-[#737373]">Projects</span>
-              </div>
-            </div>
+          ))
+        ) : error ? (
+          <div className="col-span-full py-10 text-center text-red-500">
+            Failed to load team members.
           </div>
-        ))}
+        ) : filteredTeam.length === 0 ? (
+          <div className="col-span-full py-10 text-center text-[#737373]">
+            No team members found matching "{searchQuery}"
+          </div>
+        ) : (
+          filteredTeam.map((member) => (
+            <div
+              key={member.id}
+              className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[10px] p-6 flex flex-col shadow-sm hover:border-[#0891B2] transition-colors group"
+            >
+              {/* Card Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-[42px] h-[42px] rounded-full bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center font-medium text-[16px]">
+                    {getInitials(member.profile?.firstName, member.profile?.lastName)}
+                  </div>
+                  <div className="flex flex-col">
+                    <Link
+                      href={`/team/${member.id}`}
+                      className="text-[16px] font-bold text-[#111111] hover:text-[#0891B2] hover:underline transition-colors"
+                    >
+                      {member.profile?.firstName} {member.profile?.lastName}
+                    </Link>
+                    <div className="flex items-center gap-2 text-[13px] text-[#737373] mt-0.5">
+                      <span>{member.department?.name || 'No Department'}</span>
+                      <span className="w-1 h-1 rounded-full bg-[#D4D4D8]"></span>
+                      <span>{member.roles?.map(r => r.name).join(', ') || 'No Role'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  {canManageUsers && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="text-[#A3A3A3] hover:text-[#111111] transition-colors focus:outline-none focus:ring-1 focus:ring-[#0891B2] rounded-[3px] p-0.5 inline-flex items-center justify-center">
+                        <MoreHorizontal className="w-[18px] h-[18px]" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <PermissionGuard permission={PermissionEnum.TEAM_UPDATE}>
+                          <DropdownMenuItem 
+                            className="cursor-pointer"
+                            onClick={() => setEditingMember(member)}
+                          >
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit Member
+                          </DropdownMenuItem>
+                        </PermissionGuard>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  <Badge
+                    variant="outline"
+                    className={`font-medium px-2 py-0.5 rounded-[4px] text-[11px] border ${member.isActive
+                        ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
+                        : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
+                      }`}
+                  >
+                    {member.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              <div className="flex flex-col gap-2 mt-2 pt-4 border-t border-[#FAFAFA]">
+                <div className="flex items-center gap-2.5 text-[13px] text-[#525252]">
+                  <Mail className="w-4 h-4 text-[#A3A3A3]" />
+                  <a href={`mailto:${member.email}`} className="hover:text-[#0891B2] hover:underline transition-colors truncate">
+                    {member.email}
+                  </a>
+                </div>
+                {member.phone && (
+                  <div className="flex items-center gap-2.5 text-[13px] text-[#525252]">
+                    <Phone className="w-4 h-4 text-[#A3A3A3]" />
+                    <a href={`tel:${member.phone}`} className="hover:text-[#0891B2] hover:underline transition-colors">
+                      {member.phone}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-5">
+                <Link href={`/team/${member.id}`} className="flex-1">
+                  <Button variant="outline" className="w-full bg-[#FFFFFF] border-[#E5E5E5] text-[#111111] hover:bg-[#FAFAFA] hover:text-[#0891B2] hover:border-[#0891B2] transition-colors rounded-[4px] h-[36px]">
+                    View Profile
+                  </Button>
+                </Link>
+                {canManageUsers && (
+                  <Button variant="outline" className="flex-1 bg-[#FFFFFF] border-[#E5E5E5] text-[#111111] hover:bg-[#FAFAFA] rounded-[4px] h-[36px]">
+                    Message
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
-      
-      <AddTeamMemberModal isOpen={isAddMemberOpen} onClose={() => setIsAddMemberOpen(false)} />
+
+      <AddTeamMemberModal
+        isOpen={isAddMemberOpen}
+        onClose={() => setIsAddMemberOpen(false)}
+      />
+
+      <EditTeamMemberModal 
+        isOpen={!!editingMember}
+        onClose={() => setEditingMember(null)}
+        member={editingMember}
+      />
     </div>
   );
 }

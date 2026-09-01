@@ -47,7 +47,7 @@ This document provides a quick reference for the key backend endpoints available
 
 ## 7. Tasks
 - `GET /tasks` - List tasks. Filters: `?projectId=`, `?assigneeId=`, `?status=`.
-- `POST /tasks` - Create a task. *Payload:* `{ title, description, priority, status, dueDate, projectId, assigneeId }`
+- `POST /tasks` - Create a task. *Payload:* `{ title, descri ption, priority, status, dueDate, projectId, assigneeId }`
 - `PATCH /tasks/:id` - Update task status/priority.
 - `POST /tasks/:id/subtasks` - Create a subtask checklist item.
 - `PATCH /tasks/:id/subtasks/:subId` - Mark subtask complete.
