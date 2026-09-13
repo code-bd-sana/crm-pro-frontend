@@ -61,3 +61,42 @@ export interface CreateDepartmentDto {
 }
 
 export interface UpdateDepartmentDto extends Partial<CreateDepartmentDto> {}
+
+export enum ClientStatus {
+  LEAD = 'LEAD',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+export interface Client {
+  id: string;
+  userId?: string;
+  companyName: string;
+  contactPerson?: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  industry?: string;
+  address?: string;
+  tags?: string[];
+  status: ClientStatus;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateClientDto {
+  companyName: string;
+  email: string;
+  contactPerson?: string;
+  phone?: string;
+  website?: string;
+  industry?: string;
+  address?: string;
+  tags?: string[];
+  status?: ClientStatus;
+  notes?: string;
+  userId?: string;
+}
+
+export interface UpdateClientDto extends Partial<CreateClientDto> {}

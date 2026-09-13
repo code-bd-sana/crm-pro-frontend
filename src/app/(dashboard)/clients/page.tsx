@@ -1,20 +1,36 @@
+"use client";
+
 import Link from "next/link";
 import { Search, Filter, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { NewClientButton } from "@/components/dashboard/NewClientButton";
 import { Button } from "@/components/ui/button";
-
-const clientsData = [
-  { id: 1, initials: "AC", name: "Acme Corp", industry: "Technology", contact: "Sarah Chen", lastActive: "2 hours ago", status: "Active", ltv: "$45,000" },
-  { id: 2, initials: "GI", name: "Global Industries", industry: "Manufacturing", contact: "Marcus Rodriguez", lastActive: "1 day ago", status: "Active", ltv: "$128,500" },
-  { id: 3, initials: "NS", name: "Nexus Solutions", industry: "Consulting", contact: "David Kim", lastActive: "3 days ago", status: "Active", ltv: "$24,000" },
-  { id: 4, initials: "CS", name: "CloudNine Systems", industry: "Technology", contact: "Ryan Cooper", lastActive: "2 weeks ago", status: "Inactive", ltv: "$15,600" },
-  { id: 5, initials: "PM", name: "Pinnacle Marketing", industry: "Marketing", contact: "Jessica Walsh", lastActive: "1 month ago", status: "Active", ltv: "$41,200" },
-  { id: 6, initials: "SC", name: "Silverstone Corp", industry: "Manufacturing", contact: "Michael Torres", lastActive: "4 days ago", status: "Inactive", ltv: "$55,800" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getClients } from "@/services/client.service";
 
 export default function ClientsPage() {
+  const { data: clients = [], isLoading, isError } = useQuery({
+    queryKey: ['clients'],
+    queryFn: getClients,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <p className="text-[#737373]">Loading clients...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <p className="text-red-500">Failed to load clients.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col flex-1 px-6 pt-6 pb-6 gap-6 h-full w-full">
 
@@ -60,49 +76,61 @@ export default function ClientsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientsData.map((client, idx) => (
-              <TableRow key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clientsData.length - 1 ? 'border-b border-[#E5E5E5]' : 'border-0'}`}>
-                <TableCell className="px-6 py-4">
-                  <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
-                    <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#0891B2] font-medium text-[12px]">{client.initials}</span>
-                    </div>
-                    <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.name}</span>
-                  </Link>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <span className="text-[#737373] font-normal text-[14px]">{client.industry}</span>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <span className="text-[#737373] font-normal text-[14px]">{client.contact}</span>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <span className="text-[#737373] font-normal text-[14px]">{client.lastActive}</span>
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  {client.status === "Active" ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#DCFCE7] text-[#166534] font-medium text-[12px]">
-                      Active
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#737373] font-medium text-[12px]">
-                      Inactive
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <span className="text-[#111111] font-medium text-[14px]">{client.ltv}</span>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <button className="text-[#737373] hover:text-[#111111] transition-colors">
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
+            {clients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-6 text-[#737373]">
+                  No clients found.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              clients.map((client, idx) => (
+                <TableRow key={client.id} className={`hover:bg-gray-50 transition-colors ${idx !== clients.length - 1 ? 'border-b border-[#E5E5E5]' : 'border-0'}`}>
+                  <TableCell className="px-6 py-4">
+                    <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
+                      <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#0891B2] font-medium text-[12px]">
+                          {client.companyName ? client.companyName.substring(0, 2).toUpperCase() : 'CL'}
+                        </span>
+                      </div>
+                      <span className="text-[#111111] font-medium text-[14px] group-hover:text-[#0891B2] transition-colors">{client.companyName}</span>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <span className="text-[#737373] font-normal text-[14px]">{client.industry || '-'}</span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <span className="text-[#737373] font-normal text-[14px]">{client.contactPerson || '-'}</span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <span className="text-[#737373] font-normal text-[14px]">
+                      {new Date(client.updatedAt).toLocaleDateString()}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    {client.status === "ACTIVE" ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] bg-[#DCFCE7] text-[#166534] font-medium text-[12px]">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] border border-[#E5E5E5] bg-[#FFFFFF] text-[#737373] font-medium text-[12px]">
+                        {client.status.charAt(0).toUpperCase() + client.status.slice(1).toLowerCase()}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <span className="text-[#111111] font-medium text-[14px]">-</span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <button className="text-[#737373] hover:text-[#111111] transition-colors">
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

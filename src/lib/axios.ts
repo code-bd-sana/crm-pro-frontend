@@ -50,6 +50,7 @@ api.interceptors.response.use(
         // No refresh token available — force logout
         useAuthStore.getState().logout();
         if (typeof window !== 'undefined') {
+          document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
           window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -75,6 +76,7 @@ api.interceptors.response.use(
         // Refresh also failed — full logout
         useAuthStore.getState().logout();
         if (typeof window !== 'undefined') {
+          document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
           window.location.href = '/login';
         }
         return Promise.reject(error);
