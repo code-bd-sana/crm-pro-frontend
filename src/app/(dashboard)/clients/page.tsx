@@ -8,12 +8,42 @@ import { NewClientButton } from "@/components/dashboard/NewClientButton";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getClients } from "@/services/client.service";
+import { useState } from "react";
+import { ClientFormModal } from "@/components/dashboard/ClientFormModal";
+import { DeleteClientModal } from "@/components/dashboard/DeleteClientModal";
+import { Client } from "@/types/models.types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function ClientsPage() {
-  const { data: clients = [], isLoading, isError } = useQuery({
-    queryKey: ['clients'],
-    queryFn: getClients,
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+
+  const handleOpenAdd = () => {
+    setClientToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (client: Client) => {
+    setClientToEdit(client);
+    setIsModalOpen(true);
+  };
+
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data: response, isLoading, isError } = useQuery({
+    queryKey: ['clients', page, limit],
+    queryFn: () => getClients({ page, limit }),
   });
+
+  const clients = response?.data || [];
+  const meta = response?.meta;
 
   if (isLoading) {
     return (
@@ -37,7 +67,7 @@ export default function ClientsPage() {
       {/* Header */}
       <div className="flex items-center justify-between h10">
         <h1 className="text-[#111111] font-semibold text-[24px] leading-[32px]">Clients</h1>
-        <NewClientButton />
+        <NewClientButton onClick={handleOpenAdd} />
       </div>
 
       {/* Controls Container (Search & Filter) */}
@@ -124,9 +154,21 @@ export default function ClientsPage() {
                     <span className="text-[#111111] font-medium text-[14px]">-</span>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
-                    <button className="text-[#737373] hover:text-[#111111] transition-colors">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-[#737373] hover:text-[#111111] transition-colors p-1 outline-none rounded hover:bg-gray-100">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <DropdownMenuItem onClick={() => handleOpenEdit(client)} className="cursor-pointer">
+                          Edit Client
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setClientToDelete(client)} className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50">
+                          Delete Client
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -136,36 +178,62 @@ export default function ClientsPage() {
       </div>
 
       {/* Pagination Footer */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
-        <p className="text-[14px] text-[#737373]">
-          Showing 1 to 5 of 24 entries
-        </p>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
-            Previous
-          </Button>
+      {meta && (
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
+          <p className="text-[14px] text-[#737373]">
+            Showing {((meta.page - 1) * meta.limit) + 1} to {Math.min(meta.page * meta.limit, meta.total)} of {meta.total} entries
+          </p>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]"
+              disabled={meta.page <= 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
 
-          <div className="flex items-center gap-1">
-            <Button variant="outline" className="w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2] rounded-[3px]">
-              1
-            </Button>
-            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
-              2
-            </Button>
-            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
-              3
-            </Button>
-            <span className="text-[#A3A3A3] px-1">...</span>
-            <Button variant="outline" className="w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]">
-              5
+            <div className="flex items-center gap-1">
+              {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
+                <Button 
+                  key={p}
+                  variant={p === meta.page ? "default" : "outline"}
+                  className={p === meta.page 
+                    ? "w-9 h-9 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 hover:text-white border-[#0891B2] rounded-[3px]"
+                    : "w-9 h-9 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[3px]"
+                  }
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+
+            <Button 
+              variant="outline" 
+              className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]"
+              disabled={meta.page >= meta.totalPages}
+              onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+            >
+              Next
             </Button>
           </div>
-
-          <Button variant="outline" className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]">
-            Next
-          </Button>
         </div>
-      </div>
+      )}
+
+      {/* Form Modal (Add/Edit) */}
+      <ClientFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        client={clientToEdit} 
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteClientModal 
+        isOpen={!!clientToDelete}
+        onClose={() => setClientToDelete(null)}
+        client={clientToDelete}
+      />
     </div>
 
   );

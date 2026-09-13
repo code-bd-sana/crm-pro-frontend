@@ -17,8 +17,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createClient } from "@/services/client.service";
-import { ClientStatus } from "@/types/models.types";
+import { createClient, updateClient } from "@/services/client.service";
+import { ClientStatus, Client } from "@/types/models.types";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   companyName: z.string().min(1, "Company Name is required"),
@@ -27,19 +28,21 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
   website: z.string().optional(),
-  status: z.nativeEnum(ClientStatus).default(ClientStatus.LEAD),
+  status: z.nativeEnum(ClientStatus).default(ClientStatus.ACTIVE),
   notes: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface AddClientModalProps {
+interface ClientFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  client?: Client | null; // If passed, modal is in Edit mode
 }
 
-export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
+export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProps) {
   const queryClient = useQueryClient();
+  const isEditMode = !!client;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,31 +53,65 @@ export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
       email: "",
       phone: "",
       website: "",
-      status: ClientStatus.LEAD,
+      status: ClientStatus.ACTIVE,
       notes: "",
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: createClient,
+  // Hydrate form when client data changes or modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      if (isEditMode && client) {
+        form.reset({
+          companyName: client.companyName || "",
+          industry: client.industry || "",
+          contactPerson: client.contactPerson || "",
+          email: client.email || "",
+          phone: client.phone || "",
+          website: client.website || "",
+          status: client.status || ClientStatus.ACTIVE,
+          notes: client.notes || "",
+        });
+      } else {
+        // Reset to default empty values for Add mode
+        form.reset({
+          companyName: "",
+          industry: "",
+          contactPerson: "",
+          email: "",
+          phone: "",
+          website: "",
+          status: ClientStatus.ACTIVE,
+          notes: "",
+        });
+      }
+    }
+  }, [client, isOpen, isEditMode, form]);
+
+  const mutation = useMutation({
+    mutationFn: (data: FormValues) => {
+      if (isEditMode && client?.id) {
+        return updateClient(client.id, data);
+      } else {
+        return createClient(data);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
-      toast.success("Client added successfully");
-      form.reset();
+      toast.success(isEditMode ? "Client updated successfully" : "Client added successfully");
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to add client");
+      toast.error(error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'add'} client`);
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    createMutation.mutate(values);
+    mutation.mutate(values);
   };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      form.reset();
       onClose();
     }
   };
@@ -85,7 +122,7 @@ export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
         {/* Header */}
         <DialogHeader className="px-[25px] pt-[25px] pb-4">
           <DialogTitle className="text-[#111111] font-semibold text-[18px] leading-[18px]">
-            Add New Client
+            {isEditMode ? "Edit Client" : "Add New Client"}
           </DialogTitle>
           <DialogClose className="absolute right-[25px] top-[25px] text-[#A3A3A3] hover:text-[#111111] transition-colors">
             <X className="w-4 h-4" />
@@ -118,7 +155,7 @@ export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2 flex-1">
                       <FormLabel className="text-[#111111] font-medium text-[14px] leading-[14px]">Industry</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] [&>span]:text-[#737373] data-[state=open]:ring-[#0891B2]">
                             <SelectValue placeholder="Select industry" />
@@ -202,7 +239,7 @@ export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
                 render={({ field }) => (
                   <FormItem className="flex flex-col gap-2">
                     <FormLabel className="text-[#111111] font-medium text-[14px] leading-[14px]">Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] data-[state=open]:ring-[#0891B2]">
                           <SelectValue placeholder="Status" />
@@ -251,11 +288,11 @@ export function AddClientModal({ isOpen, onClose }: AddClientModalProps) {
               </Button>
               <Button 
                 type="submit" 
-                disabled={createMutation.isPending}
+                disabled={mutation.isPending}
                 className="h-[36px] px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 rounded-[4px] text-white font-medium text-[14px] transition-colors"
               >
-                {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Client
+                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEditMode ? "Update Client" : "Save Client"}
               </Button>
             </div>
           </form>

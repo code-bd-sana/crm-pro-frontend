@@ -1,8 +1,14 @@
 import { api } from '@/lib/axios';
 import type { Client, CreateClientDto, UpdateClientDto, ApiResponse } from '@/types/models.types';
 
-export const getClients = (): Promise<Client[]> =>
-  api.get<ApiResponse<Client[]>>('/clients').then((res) => res.data.data);
+interface GetClientsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export const getClients = (params?: GetClientsParams): Promise<ApiResponse<Client[]>> =>
+  api.get<ApiResponse<Client[]>>('/clients', { params }).then((res) => res.data);
 
 export const getClientById = (id: string): Promise<Client> =>
   api.get<ApiResponse<Client>>(`/clients/${id}`).then((res) => res.data.data);
