@@ -42,16 +42,15 @@ export function DeleteClientModal({ isOpen, onClose, client }: DeleteClientModal
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4 flex gap-2 sm:justify-end">
-          <DialogClose asChild>
-            <Button 
-              type="button" 
-              variant="outline" 
-              className="bg-[#FAFAFA] border-[#E5E5E5] text-[#111111] hover:bg-gray-50 h-[36px]"
-              disabled={mutation.isPending}
-            >
-              Cancel
-            </Button>
-          </DialogClose>
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="bg-[#FAFAFA] border-[#E5E5E5] text-[#111111] hover:bg-gray-50 h-[36px]"
+            disabled={mutation.isPending}
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
           <Button 
             type="button" 
             variant="destructive"

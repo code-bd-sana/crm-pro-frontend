@@ -45,7 +45,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
   const isEditMode = !!client;
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       companyName: "",
       industry: "",

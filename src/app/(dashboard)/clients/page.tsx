@@ -119,7 +119,7 @@ export default function ClientsPage() {
                     <input type="checkbox" className="w-4 h-4 rounded border-[#E5E5E5] text-[#0891B2] focus:ring-[#0891B2]" />
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <Link href={`/clients/${client.id}`} className="flex items-center gap-3 group">
+                    <Link href={`/clients/${client.id}`} prefetch={false} className="flex items-center gap-3 group">
                       <div className="w-8 h-8 rounded-full bg-[#0891B2]/10 flex items-center justify-center flex-shrink-0">
                         <span className="text-[#0891B2] font-medium text-[12px]">
                           {client.companyName ? client.companyName.substring(0, 2).toUpperCase() : 'CL'}
@@ -155,10 +155,8 @@ export default function ClientsPage() {
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="text-[#737373] hover:text-[#111111] transition-colors p-1 outline-none rounded hover:bg-gray-100">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
+                      <DropdownMenuTrigger className="text-[#737373] hover:text-[#111111] transition-colors p-1 outline-none rounded hover:bg-gray-100">
+                        <MoreVertical className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px]">
                         <DropdownMenuItem onClick={() => handleOpenEdit(client)} className="cursor-pointer">

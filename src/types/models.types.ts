@@ -108,3 +108,17 @@ export interface CreateClientDto {
 }
 
 export interface UpdateClientDto extends Partial<CreateClientDto> {}
+
+export interface PaginatedResponse<T> {
+  data: T;
+  meta: PaginationMeta;
+}
+export interface Project {}
+export interface CreateProjectDto {}
+export interface UpdateProjectDto {}
+export interface Task {}
+export interface CreateTaskDto {}
+export interface UpdateTaskDto {}
+export interface Invoice {}
+export interface CreateInvoiceDto {}
+export interface UpdateInvoiceDto {}
