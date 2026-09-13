@@ -70,15 +70,30 @@ export interface CreateDepartmentDto {
 
 export interface UpdateDepartmentDto extends Partial<CreateDepartmentDto> {}
 
+// ============================================================
+// Clients Module
+// ============================================================
+
+
 export enum ClientStatus {
   LEAD = 'LEAD',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
 }
 
+export interface ClientCommunication {
+  id: string;
+  clientId: string;
+  type: string;
+  content: string;
+  date: string;
+  createdAt: string;
+}
+
 export interface Client {
   id: string;
-  userId?: string;
+  user?: any; // The user who manages this client
+
   companyName: string;
   contactPerson?: string;
   email: string;
@@ -89,14 +104,18 @@ export interface Client {
   tags?: string[];
   status: ClientStatus;
   notes?: string;
+  communications?: ClientCommunication[];
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
+
 }
 
 export interface CreateClientDto {
   companyName: string;
-  email: string;
   contactPerson?: string;
+  email: string;
+
   phone?: string;
   website?: string;
   industry?: string;
@@ -104,15 +123,30 @@ export interface CreateClientDto {
   tags?: string[];
   status?: ClientStatus;
   notes?: string;
-  userId?: string;
+
 }
 
 export interface UpdateClientDto extends Partial<CreateClientDto> {}
 
-export interface PaginatedResponse<T> {
-  data: T;
-  meta: PaginationMeta;
+export interface QueryClientDto {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: ClientStatus;
+  tag?: string;
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+
 export interface Project {}
 export interface CreateProjectDto {}
 export interface UpdateProjectDto {}
