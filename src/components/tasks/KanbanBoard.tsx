@@ -15,44 +15,38 @@ import {
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanCard } from "./KanbanCard";
+import type { Task } from "@/types/models.types";
+import { TaskStatus } from "@/types/models.types";
 
-// Define Task Type
-export type Task = {
-  id: string;
-  name: string;
-  assignee: { name: string; initials: string; avatar: string };
-  project: string;
-  dueDate: string;
-  priority: string;
-  status: "Backlog" | "To Do" | "In Progress" | "Done" | "Completed" | "Pending";
-};
+const COLUMNS: { id: TaskStatus; label: string }[] = [
+  { id: TaskStatus.TODO, label: "To Do" },
+  { id: TaskStatus.IN_PROGRESS, label: "In Progress" },
+  { id: TaskStatus.DONE, label: "Done" },
+];
 
 type KanbanBoardProps = {
-  initialTasks: Task[];
+  tasks: Task[];
   onTaskClick?: (task: Task) => void;
+  onStatusChange?: (taskId: string, status: TaskStatus) => void;
 };
 
-const COLUMNS = ["Backlog", "To Do", "In Progress", "Done"] as const;
-
-export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
-  // Normalize status for Kanban board to match the 3 columns
-  const normalizedTasks = initialTasks.map((t) => ({
-    ...t,
-    column: t.status === "Pending" ? "To Do" : t.status === "Completed" ? "Done" : t.status,
-  }));
-
-  const [tasks, setTasks] = useState(normalizedTasks);
+export function KanbanBoard({ tasks, onTaskClick, onStatusChange }: KanbanBoardProps) {
+  // Optimistic overrides applied while dragging across columns; cleared when props catch up
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, TaskStatus>>({});
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const displayedTasks = tasks.map((task) =>
+    statusOverrides[task.id] ? { ...task, status: statusOverrides[task.id] } : task
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px movement required before drag starts
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -60,52 +54,41 @@ export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
     })
   );
 
+  const getTaskStatus = (taskId: string): TaskStatus | undefined =>
+    displayedTasks.find((t) => t.id === taskId)?.status;
+
+  const resolveTargetStatus = (overId: string, overType: string | undefined): TaskStatus | undefined => {
+    if (overType === "Column") return overId as TaskStatus;
+    if (overType === "Task") return getTaskStatus(overId);
+    return undefined;
+  };
+
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const task = tasks.find((t) => t.id === active.id);
-    if (task) setActiveTask(task as any);
+    const task = displayedTasks.find((t) => t.id === active.id);
+    if (task) setActiveTask(task);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+    const isActiveTask = active.data.current?.type === "Task";
+    if (!isActiveTask) return;
+
+    const activeId = String(active.id);
+    const overId = String(over.id);
 
     if (activeId === overId) return;
 
-    const isActiveTask = active.data.current?.type === "Task";
-    const isOverTask = over.data.current?.type === "Task";
-    const isOverColumn = over.data.current?.type === "Column";
+    const targetStatus = resolveTargetStatus(overId, over.data.current?.type);
+    if (!targetStatus) return;
 
-    if (!isActiveTask) return;
+    const currentStatus = getTaskStatus(activeId);
+    if (!currentStatus || currentStatus === targetStatus) return;
 
-    // Dropping a Task over another Task
-    if (isActiveTask && isOverTask) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
-
-        if (tasks[activeIndex].column !== tasks[overIndex].column) {
-          const newTasks = [...tasks];
-          newTasks[activeIndex].column = tasks[overIndex].column;
-          return arrayMove(newTasks, activeIndex, overIndex);
-        }
-
-        return arrayMove(tasks, activeIndex, overIndex);
-      });
-    }
-
-    // Dropping a Task over a Column (empty space)
-    if (isActiveTask && isOverColumn) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const newTasks = [...tasks];
-        newTasks[activeIndex].column = overId as "Backlog" | "To Do" | "In Progress" | "Done";
-        return arrayMove(newTasks, activeIndex, activeIndex);
-      });
-    }
+    setStatusOverrides((prev) => ({ ...prev, [activeId]: targetStatus }));
+    onStatusChange?.(activeId, targetStatus);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -113,16 +96,18 @@ export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
     const { active, over } = event;
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
-
+    const activeId = String(active.id);
+    const overId = String(over.id);
     if (activeId === overId) return;
 
-    setTasks((tasks) => {
-      const activeIndex = tasks.findIndex((t) => t.id === activeId);
-      const overIndex = tasks.findIndex((t) => t.id === overId);
-      return arrayMove(tasks, activeIndex, overIndex);
-    });
+    const targetStatus = resolveTargetStatus(overId, over.data.current?.type);
+    if (!targetStatus) return;
+
+    const currentStatus = getTaskStatus(activeId);
+    if (!currentStatus || currentStatus === targetStatus) return;
+
+    setStatusOverrides((prev) => ({ ...prev, [activeId]: targetStatus }));
+    onStatusChange?.(activeId, targetStatus);
   };
 
   const dropAnimationConfig = {
@@ -144,17 +129,18 @@ export function KanbanBoard({ initialTasks, onTaskClick }: KanbanBoardProps) {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        {COLUMNS.map((colId) => (
+        {COLUMNS.map((column) => (
           <KanbanColumn
-            key={colId}
-            columnId={colId}
-            tasks={tasks.filter((t) => t.column === colId) as any}
+            key={column.id}
+            columnId={column.id}
+            label={column.label}
+            tasks={displayedTasks.filter((t) => t.status === column.id)}
             onTaskClick={onTaskClick}
           />
         ))}
 
         <DragOverlay dropAnimation={dropAnimationConfig}>
-          {activeTask ? <KanbanCard task={activeTask as any} /> : null}
+          {activeTask ? <KanbanCard task={activeTask} /> : null}
         </DragOverlay>
       </DndContext>
     </div>

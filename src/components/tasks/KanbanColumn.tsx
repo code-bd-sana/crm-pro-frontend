@@ -4,15 +4,16 @@ import React, { useMemo } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import { KanbanCard } from "./KanbanCard";
-import { Task } from "./KanbanBoard";
+import type { Task, TaskStatus } from "@/types/models.types";
 
 interface KanbanColumnProps {
-  columnId: string;
+  columnId: TaskStatus;
+  label: string;
   tasks: Task[];
   onTaskClick?: (task: Task) => void;
 }
 
-export function KanbanColumn({ columnId, tasks, onTaskClick }: KanbanColumnProps) {
+export function KanbanColumn({ columnId, label, tasks, onTaskClick }: KanbanColumnProps) {
   const taskIds = useMemo(() => tasks.map((t) => t.id), [tasks]);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -27,7 +28,7 @@ export function KanbanColumn({ columnId, tasks, onTaskClick }: KanbanColumnProps
     <div className="flex flex-col w-[280px] md:w-[320px] shrink-0 snap-center md:snap-align-none">
       {/* Column Header */}
       <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-[16px] font-semibold text-[#111111]">{columnId}</h2>
+        <h2 className="text-[16px] font-semibold text-[#111111]">{label}</h2>
         <div className="bg-[#F1F5F9] border border-[#E5E5E5] text-[#737373] text-[12px] font-semibold w-7 h-6 flex items-center justify-center rounded-full">
           {tasks.length}
         </div>

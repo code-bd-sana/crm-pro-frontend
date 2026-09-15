@@ -243,7 +243,8 @@ export enum TaskPriority {
 export interface Task {
   id: string;
   project?: Project;
-  projectId: string;
+  // API responses expose relations only (project/assignee objects), not raw FK ids
+  projectId?: string;
   assignee?: User | null;
   assigneeId?: string | null;
   title: string;
@@ -267,7 +268,35 @@ export interface CreateTaskDto {
   tags?: string[];
 }
 
-export type UpdateTaskDto = Partial<CreateTaskDto>;
+export interface UpdateTaskDto extends Partial<Omit<CreateTaskDto, "assigneeId" | "projectId">> {
+  assigneeId?: string | null;
+}
+
+export interface Subtask {
+  id: string;
+  taskId: string;
+  title: string;
+  isCompleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSubtaskDto {
+  title: string;
+  isCompleted?: boolean;
+}
+
+export type UpdateSubtaskDto = Partial<CreateSubtaskDto>;
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  user: User;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Invoice {}
 export interface CreateInvoiceDto {}
 export interface UpdateInvoiceDto {}
