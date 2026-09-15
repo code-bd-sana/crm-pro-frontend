@@ -141,8 +141,8 @@ export default function TeamPage() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`pb-2 text-[14px] font-medium transition-colors relative ${activeTab === tab
-                ? "text-[#111111]"
-                : "text-[#737373] hover:text-[#111111]"
+              ? "text-[#111111]"
+              : "text-[#737373] hover:text-[#111111]"
               }`}
           >
             {tab}
@@ -198,7 +198,7 @@ export default function TeamPage() {
                       {member.profile?.firstName} {member.profile?.lastName}
                     </Link>
                     <div className="flex items-center gap-2 text-[13px] text-[#737373] mt-0.5">
-                      <span>{member.department?.name || 'No Department'}</span>
+                      <span>{member.profile?.department?.name || 'No Department'}</span>
                       <span className="w-1 h-1 rounded-full bg-[#D4D4D8]"></span>
                       <span>{member.roles?.map(r => r.name).join(', ') || 'No Role'}</span>
                     </div>
@@ -236,8 +236,8 @@ export default function TeamPage() {
                   <Badge
                     variant="outline"
                     className={`font-medium px-2 py-0.5 rounded-[4px] text-[11px] border ${member.isActive
-                        ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
-                        : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
+                      ? "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
+                      : "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
                       }`}
                   >
                     {member.isActive ? "Active" : "Inactive"}
@@ -253,11 +253,11 @@ export default function TeamPage() {
                     {member.email}
                   </a>
                 </div>
-                {member.phone && (
+                {member.profile?.phone && (
                   <div className="flex items-center gap-2.5 text-[13px] text-[#525252]">
                     <Phone className="w-4 h-4 text-[#A3A3A3]" />
-                    <a href={`tel:${member.phone}`} className="hover:text-[#0891B2] hover:underline transition-colors">
-                      {member.phone}
+                    <a href={`tel:${member.profile.phone}`} className="hover:text-[#0891B2] hover:underline transition-colors">
+                      {member.profile.phone}
                     </a>
                   </div>
                 )}

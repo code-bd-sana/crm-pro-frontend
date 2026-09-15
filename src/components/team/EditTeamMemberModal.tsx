@@ -84,8 +84,8 @@ export function EditTeamMemberModal({ isOpen, onClose, member }: EditTeamMemberM
         firstName: member.profile?.firstName || "",
         lastName: member.profile?.lastName || "",
         email: member.email || "",
-        phone: member.phone || "",
-        departmentId: member.departmentId || "",
+        phone: member.profile?.phone || "",
+        departmentId: member.profile?.department?.id || "",
         roleId: member.roles?.[0]?.id || "",
       });
     }
@@ -93,9 +93,10 @@ export function EditTeamMemberModal({ isOpen, onClose, member }: EditTeamMemberM
 
   const { mutate: editMember, isPending } = useMutation({
     mutationFn: (values: FormValues) => {
+      const { roleId, ...rest } = values;
       const payload = {
-        ...values,
-        roleIds: [values.roleId], // Wrap single role in array for backend
+        ...rest,
+        roleIds: [roleId], // Wrap single role in array for backend
       };
       return updateUser(member.id, payload);
     },
@@ -198,7 +199,7 @@ export function EditTeamMemberModal({ isOpen, onClose, member }: EditTeamMemberM
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {departments.map((dept) => (
+                        {departments.filter(d => d.isActive !== false || d.id === field.value).map((dept) => (
                           <SelectItem key={dept.id} value={dept.id}>
                             {dept.name}
                           </SelectItem>

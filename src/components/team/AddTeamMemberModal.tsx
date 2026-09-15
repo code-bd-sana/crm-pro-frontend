@@ -221,7 +221,7 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {departments.map((dept) => (
+                        {departments.filter(d => d.isActive !== false || d.id === field.value).map((dept) => (
                           <SelectItem key={dept.id} value={dept.id}>
                             {dept.name}
                           </SelectItem>

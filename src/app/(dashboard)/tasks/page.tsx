@@ -367,17 +367,36 @@ export default function TasksPage() {
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]"
+                  className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px] px-3 font-medium"
                 >
                   Previous
                 </Button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((p) => (
+                    <Button
+                      key={p}
+                      variant={p === page ? "default" : "outline"}
+                      className={p === page
+                        ? "w-8 h-8 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 border-[#0891B2] rounded-[4px] text-[13px] font-medium"
+                        : "w-8 h-8 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[4px] text-[13px] font-medium"
+                      }
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ))}
+                </div>
+
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={page >= totalPages}
-                  className="border-[#E5E5E5] bg-white text-[#111111] font-medium h-9 px-4 hover:bg-[#F8FAFC] rounded-[3px]"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages || totalPages === 0}
+                  className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px] px-3 font-medium"
                 >
                   Next
                 </Button>
