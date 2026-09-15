@@ -20,13 +20,9 @@ export const getNotifications = async (page = 1, limit = 20) => {
   return response.data.data;
 };
 
-/**
- * Backend has no /notifications/unread-count endpoint yet.
- * Unread count is derived client-side from the notification list.
- */
 export const getUnreadCount = async (): Promise<number> => {
-  const notifications = await getNotifications(1, 100);
-  return notifications.filter((notification) => !notification.isRead).length;
+  const response = await api.get<{ success: boolean; data: number }>(`${BASE_PATH}/unread-count`);
+  return response.data.data;
 };
 
 export const markAsRead = async (id: string) => {

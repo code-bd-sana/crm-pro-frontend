@@ -9,9 +9,21 @@ import {
 } from "@/components/ui/popover";
 import NotificationPanel from "./NotificationPanel";
 import { useUIStore } from "@/store/useUIStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useQuery } from "@tanstack/react-query";
+import { getUnreadCount } from "@/services/notification.service";
 
 export default function Topbar() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
+  const user = useAuthStore((state) => state.user);
+
+  const { data: unreadCount } = useQuery({
+    queryKey: ["notifications-unread-count"],
+    queryFn: getUnreadCount,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  const initials = `${user?.profile?.firstName?.charAt(0) || ''}${user?.profile?.lastName?.charAt(0) || ''}`.toUpperCase() || 'U';
 
   return (
     <div className="h-16 bg-[#FFFFFF] border-b border-[#E5E5E5] flex items-center justify-between px-6 flex-shrink-0">
@@ -44,9 +56,11 @@ export default function Topbar() {
         <Popover>
           <PopoverTrigger className="relative text-[#737373] hover:text-[#111111] transition-colors w-5 h-5 flex items-center justify-center outline-none">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#EF4444] rounded flex items-center justify-center text-[10px] font-medium text-white leading-[15px]">
-              3
-            </span>
+            {typeof unreadCount === "number" && unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#EF4444] rounded flex items-center justify-center text-[10px] font-medium text-white leading-[15px]">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 border-none shadow-none rounded-[10px]" align="end" sideOffset={12}>
             <NotificationPanel />
@@ -54,7 +68,7 @@ export default function Topbar() {
         </Popover>
 
         <div className="w-10 h-10 rounded-full bg-[#0891B2] flex items-center justify-center text-white font-normal text-base cursor-pointer">
-          SC
+          {initials}
         </div>
       </div>
 
