@@ -3,16 +3,20 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
 
-const data = [
-  { name: "Ryan Cooper", tasks: 25 },
-  { name: "Lisa Anderson", tasks: 28 },
-  { name: "Emily Foster", tasks: 32 },
-  { name: "Marcus Rodriguez", tasks: 34 },
-  { name: "David Kim", tasks: 38 },
-  { name: "Sarah Chen", tasks: 41 },
-];
+interface TaskCompletionMember {
+  name: string;
+  completed: number;
+}
 
-export function TaskCompletionChart() {
+interface TaskCompletionChartProps {
+  taskCompletionByMember?: TaskCompletionMember[];
+}
+
+export function TaskCompletionChart({ taskCompletionByMember }: TaskCompletionChartProps) {
+  const data = (taskCompletionByMember ?? []).slice(0, 6);
+  const maxValue = data.length > 0 ? Math.max(...data.map((d) => d.completed)) : 0;
+  const xMax = maxValue > 0 ? Math.ceil(maxValue * 1.2 / 5) * 5 : 10;
+
   return (
     <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm flex flex-col h-full">
       <h2 className="text-[14px] font-bold text-[#111111] mb-6">Task Completion by Member</h2>
@@ -30,28 +34,27 @@ export function TaskCompletionChart() {
             barSize={20}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E5E5" />
-            <XAxis 
+            <XAxis
               type="number"
-              axisLine={true} 
-              tickLine={true} 
-              tick={{ fontSize: 11, fill: "#737373" }} 
-              ticks={[0, 15, 30, 45, 60]}
-              domain={[0, 60]}
+              axisLine={true}
+              tickLine={true}
+              tick={{ fontSize: 11, fill: "#737373" }}
+              domain={[0, xMax]}
               stroke="#E5E5E5"
             />
-            <YAxis 
-              dataKey="name" 
+            <YAxis
+              dataKey="name"
               type="category"
-              axisLine={true} 
-              tickLine={true} 
-              tick={{ fontSize: 11, fill: "#737373" }} 
+              axisLine={true}
+              tickLine={true}
+              tick={{ fontSize: 11, fill: "#737373" }}
               stroke="#E5E5E5"
             />
-            <Tooltip 
+            <Tooltip
               cursor={{ fill: "#F5F5F5" }}
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
             />
-            <Bar dataKey="tasks" fill="#65A34E" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="completed" fill="#65A34E" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

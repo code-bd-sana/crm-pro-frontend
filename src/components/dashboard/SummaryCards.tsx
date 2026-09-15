@@ -1,48 +1,60 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Users, 
-  FolderKanban, 
-  CheckSquare, 
-  BarChart2, 
-  TrendingUp, 
-  TrendingDown 
+import {
+  Users,
+  FolderKanban,
+  CheckSquare,
+  BarChart2,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
+import type { DashboardSummary } from "@/services/analytics.service";
 
-const summaryData = [
-  {
-    title: "Total Clients",
-    value: "248",
-    change: "+12%",
-    icon: Users,
-    isPositive: true,
-  },
-  {
-    title: "Active Projects",
-    value: "12",
-    change: "+3",
-    icon: FolderKanban,
-    isPositive: true,
-  },
-  {
-    title: "Tasks Due Today",
-    value: "7",
-    change: "-2",
-    icon: CheckSquare,
-    isPositive: false,
-  },
-  {
-    title: "Revenue This Month",
-    value: "$24,800",
-    change: "+18%",
-    icon: BarChart2,
-    isPositive: true,
-  },
-];
+interface SummaryCardsProps {
+  summary?: DashboardSummary;
+}
 
-export function SummaryCards() {
+function formatCurrency(value: number): string {
+  if (value >= 1000) {
+    return `$${(value / 1000).toFixed(1)}k`;
+  }
+  return `$${value.toFixed(0)}`;
+}
+
+export function SummaryCards({ summary }: SummaryCardsProps) {
+  const data = [
+    {
+      title: "Total Clients",
+      value: String(summary?.totalClients ?? 0),
+      change: "+0",
+      icon: Users,
+      isPositive: true,
+    },
+    {
+      title: "Active Projects",
+      value: String(summary?.activeProjects ?? 0),
+      change: "+0",
+      icon: FolderKanban,
+      isPositive: true,
+    },
+    {
+      title: "Tasks Due Today",
+      value: String(summary?.tasksDueToday ?? 0),
+      change: "-0",
+      icon: CheckSquare,
+      isPositive: false,
+    },
+    {
+      title: "Revenue This Month",
+      value: formatCurrency(summary?.revenueThisMonth ?? 0),
+      change: "+0%",
+      icon: BarChart2,
+      isPositive: true,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      {summaryData.map((item) => {
+      {data.map((item) => {
         const Icon = item.icon;
         const TrendIcon = item.isPositive ? TrendingUp : TrendingDown;
         return (

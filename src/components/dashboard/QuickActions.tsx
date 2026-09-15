@@ -1,14 +1,19 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserPlus, FolderPlus, PlusSquare, FilePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const quickActionsData = [
-  { title: "Add Client", description: "Create a new client", icon: UserPlus, color: "text-[#3B82F6]", bgColor: "bg-[#EFF6FF]" },
-  { title: "Create Project", description: "Start a new project", icon: FolderPlus, color: "text-[#8B5CF6]", bgColor: "bg-[#F5F3FF]" },
-  { title: "Create Task", description: "Add a new task", icon: PlusSquare, color: "text-[#22C55E]", bgColor: "bg-[#DCFCE7]" },
-  { title: "New Invoice", description: "Generate an invoice", icon: FilePlus, color: "text-[#F97316]", bgColor: "bg-[#FFEDD4]" },
+  { title: "Add Client", description: "Create a new client", icon: UserPlus, color: "text-[#3B82F6]", bgColor: "bg-[#EFF6FF]", href: "/clients" },
+  { title: "Create Project", description: "Start a new project", icon: FolderPlus, color: "text-[#8B5CF6]", bgColor: "bg-[#F5F3FF]", href: "/projects" },
+  { title: "Create Task", description: "Add a new task", icon: PlusSquare, color: "text-[#22C55E]", bgColor: "bg-[#DCFCE7]", href: "/tasks" },
+  { title: "New Invoice", description: "Generate an invoice", icon: FilePlus, color: "text-[#F97316]", bgColor: "bg-[#FFEDD4]", href: "/invoices" },
 ];
 
 export function QuickActions() {
+  const router = useRouter();
+
   return (
     <Card className="bg-[#FFFFFF] border-[#E5E5E5] shadow-none rounded-[10px] h-[416px] xl:col-span-1">
       <CardHeader className="h-[46px] p-6 pb-0 flex justify-center">
@@ -19,8 +24,9 @@ export function QuickActions() {
           {quickActionsData.map((action, index) => {
             const ActionIcon = action.icon;
             return (
-              <button 
+              <button
                 key={index}
+                onClick={() => router.push(action.href)}
                 className="flex flex-col items-start justify-center p-4 border border-[#E5E5E5] rounded-md hover:bg-gray-50 transition-colors text-left"
               >
                 <div className={`w-8 h-8 rounded-md flex items-center justify-center mb-4 ${action.bgColor}`}>

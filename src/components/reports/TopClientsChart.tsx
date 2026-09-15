@@ -3,15 +3,20 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
 
-const data = [
-  { name: "Tectonic Studio", revenue: 32000 },
-  { name: "Pinnacle Marketing", revenue: 41000 },
-  { name: "Meridian Logistics", revenue: 48000 },
-  { name: "Silverstone Corp", revenue: 55000 },
-  { name: "Vaultline Finance", revenue: 67000 },
-];
+interface TopClient {
+  name: string;
+  value: number;
+}
 
-export function TopClientsChart() {
+interface TopClientsChartProps {
+  topClients?: TopClient[];
+}
+
+export function TopClientsChart({ topClients }: TopClientsChartProps) {
+  const data = (topClients ?? []).slice(0, 5);
+  const maxValue = data.length > 0 ? Math.max(...data.map((d) => d.value)) : 0;
+  const xMax = maxValue > 0 ? Math.ceil(maxValue * 1.2 / 10000) * 10000 : 1000;
+
   return (
     <div className="bg-white border border-[#E5E5E5] rounded-[10px] p-6 shadow-sm flex flex-col h-full">
       <h2 className="text-[14px] font-bold text-[#111111] mb-6">Top 5 Clients by Revenue</h2>
@@ -29,29 +34,31 @@ export function TopClientsChart() {
             barSize={20}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E5E5" />
-            <XAxis 
+            <XAxis
               type="number"
-              axisLine={true} 
-              tickLine={true} 
-              tick={{ fontSize: 11, fill: "#737373" }} 
-              ticks={[0, 20000, 40000, 60000, 80000]}
-              domain={[0, 80000]}
+              axisLine={true}
+              tickLine={true}
+              tick={{ fontSize: 11, fill: "#737373" }}
+              domain={[0, xMax]}
+              tickFormatter={(value: number) =>
+                value >= 1000 ? `$${(value / 1000).toFixed(0)}k` : `$${value}`
+              }
               stroke="#E5E5E5"
             />
-            <YAxis 
-              dataKey="name" 
+            <YAxis
+              dataKey="name"
               type="category"
-              axisLine={true} 
-              tickLine={true} 
-              tick={{ fontSize: 11, fill: "#737373" }} 
+              axisLine={true}
+              tickLine={true}
+              tick={{ fontSize: 11, fill: "#737373" }}
               stroke="#E5E5E5"
             />
-            <Tooltip 
+            <Tooltip
               cursor={{ fill: "#F5F5F5" }}
               contentStyle={{ borderRadius: "8px", border: "1px solid #E5E5E5", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}
-              formatter={(value: any) => [`$${value.toLocaleString()}`, "Revenue"]}
+              formatter={(value: any) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
             />
-            <Bar dataKey="revenue" fill="#4477A1" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="value" fill="#4477A1" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

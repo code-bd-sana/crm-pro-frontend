@@ -1,13 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
+import type { DashboardDeadline } from "@/services/analytics.service";
 
-const upcomingDeadlinesData = [
-  { title: "Website Redesign", due: "Due Apr 12, 2026", progress: 75, assignees: ["SC", "MR", "EF"] },
-  { title: "Mobile App Launch", due: "Due Apr 15, 2026", progress: 60, assignees: ["LA", "DK"] },
-  { title: "Q2 Marketing Campaign", due: "Due Apr 18, 2026", progress: 40, assignees: ["RC", "SC"] },
-  { title: "Data Migration", due: "Due Apr 20, 2026", progress: 85, assignees: ["MR", "DK", "EF"] },
-];
+interface UpcomingDeadlinesProps {
+  deadlines?: DashboardDeadline[];
+}
 
-export function UpcomingDeadlines() {
+const priorityConfig: Record<string, { label: string; color: string; bg: string }> = {
+  LOW: { label: "Low", color: "text-[#475569]", bg: "bg-[#F1F5F9]" },
+  MEDIUM: { label: "Medium", color: "text-[#A16207]", bg: "bg-[#FEF9C3]" },
+  HIGH: { label: "High", color: "text-[#C2410C]", bg: "bg-[#FFEDD5]" },
+  CRITICAL: { label: "Critical", color: "text-[#B91C1C]", bg: "bg-[#FEE2E2]" },
+};
+
+export function UpcomingDeadlines({ deadlines }: UpcomingDeadlinesProps) {
+  const items = deadlines ?? [];
+
   return (
     <Card className="bg-[#FFFFFF] border-[#E5E5E5] shadow-none rounded-[10px] mb-6">
       <CardHeader className="h-[46px] p-6 pb-0 flex justify-center">
@@ -15,27 +23,43 @@ export function UpcomingDeadlines() {
       </CardHeader>
       <CardContent className="px-6 pt-[25px] pb-6">
         <div className="flex flex-col gap-4">
-          {upcomingDeadlinesData.map((item, index) => (
-            <div key={index} className="flex flex-col gap-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-[#111111] font-medium text-[14px] leading-[20px]">{item.title}</p>
-                  <p className="text-[#737373] font-normal text-[12px] leading-[16px]">{item.due}</p>
-                </div>
-                <div className="flex -space-x-2">
-                  {item.assignees.map((assignee, i) => (
-                    <div key={i} className="w-6 h-6 rounded-full bg-[#0891B2]/10 border-2 border-white flex items-center justify-center relative">
-                      <span className="text-[#0891B2] text-[10px] font-medium">{assignee}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Progress Bar */}
-              <div className="w-full bg-[#F5F5F5] rounded-full h-1.5">
-                <div className="bg-[#0891B2] h-1.5 rounded-full" style={{ width: `${item.progress}%` }} />
-              </div>
+          {items.length === 0 ? (
+            <div className="text-center text-[#737373] text-sm py-6">
+              No upcoming deadlines in the next 7 days.
             </div>
-          ))}
+          ) : (
+            items.map((item) => {
+              const priority = priorityConfig[item.priority] ?? priorityConfig.MEDIUM;
+              return (
+                <div key={item.id} className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="text-[#111111] font-medium text-[14px] leading-[20px]">{item.title}</p>
+                        <p className="text-[#737373] font-normal text-[12px] leading-[16px]">
+                          {item.projectTitle ? `${item.projectTitle} · ` : ""}
+                          Due {format(new Date(item.dueDate), "MMM d, yyyy")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-[4px] ${priority.bg} ${priority.color}`}>
+                        {priority.label}
+                      </span>
+                      {item.assigneeName && (
+                        <div className="w-6 h-6 rounded-full bg-[#0891B2]/10 border border-white flex items-center justify-center">
+                          <span className="text-[#0891B2] text-[10px] font-medium">
+                            {item.assigneeName.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-full bg-[#F5F5F5] rounded-full h-1.5" />
+                </div>
+              );
+            })
+          )}
         </div>
       </CardContent>
     </Card>

@@ -1,15 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDistanceToNow } from "date-fns";
+import type { DashboardActivity } from "@/services/analytics.service";
 
-const recentActivityData = [
-  { initials: "SC", name: "Sarah Chen", action: "completed task in Project Phoenix", time: "5 min ago" },
-  { initials: "MR", name: "Marcus Rodriguez", action: "added new client Meridian Logistics", time: "12 min ago" },
-  { initials: "EF", name: "Emily Foster", action: "updated invoice INV-2024-0047", time: "1 hour ago" },
-  { initials: "DK", name: "David Kim", action: "commented on Design System Overhaul", time: "2 hours ago" },
-  { initials: "LA", name: "Lisa Anderson", action: "marked project as completed", time: "3 hours ago" },
-  { initials: "RC", name: "Ryan Cooper", action: "created new task in Mobile App", time: "4 hours ago" },
-];
+interface RecentActivityProps {
+  activities?: DashboardActivity[];
+}
 
-export function RecentActivity() {
+export function RecentActivity({ activities }: RecentActivityProps) {
+  const items = activities ?? [];
+
   return (
     <Card className="bg-[#FFFFFF] border-[#E5E5E5] shadow-none rounded-[10px] h-[416px] xl:col-span-2">
       <CardHeader className="h-[46px] p-6 pb-0 flex justify-center">
@@ -17,21 +16,31 @@ export function RecentActivity() {
       </CardHeader>
       <CardContent className="px-6 pt-[25px]">
         <div className="flex flex-col gap-4 h-[320px] overflow-y-auto pr-2">
-          {recentActivityData.map((activity, index) => (
-            <div key={index} className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#0891B2]/10 flex flex-shrink-0 items-center justify-center">
-                <span className="text-[#0891B2] font-medium text-[14px]">{activity.initials}</span>
-              </div>
-              <div className="flex flex-col flex-1 min-w-0 pt-0.5">
-                <p className="text-[14px] leading-[20px] text-[#111111] truncate">
-                  <span className="font-medium">{activity.name}</span> <span className="font-normal">{activity.action}</span>
-                </p>
-                <p className="text-[12px] leading-[16px] text-[#737373] mt-0.5">
-                  {activity.time}
-                </p>
-              </div>
+          {items.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-[#737373] text-sm">
+              No recent activity yet.
             </div>
-          ))}
+          ) : (
+            items.map((activity) => (
+              <div key={activity.id} className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#0891B2]/10 flex flex-shrink-0 items-center justify-center">
+                  <span className="text-[#0891B2] font-medium text-[14px]">{activity.initials}</span>
+                </div>
+                <div className="flex flex-col flex-1 min-w-0 pt-0.5">
+                  <p className="text-[14px] leading-[20px] text-[#111111] truncate">
+                    <span className="font-medium">{activity.userName}</span>{" "}
+                    <span className="font-normal">{activity.description}</span>
+                    {activity.taskTitle && (
+                      <span className="font-normal text-[#0891B2]"> in {activity.taskTitle}</span>
+                    )}
+                  </p>
+                  <p className="text-[12px] leading-[16px] text-[#737373] mt-0.5">
+                    {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </CardContent>
     </Card>
