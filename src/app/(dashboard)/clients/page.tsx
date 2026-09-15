@@ -275,22 +275,39 @@ export default function ClientsPage() {
             <p className="text-[14px] text-[#737373]">
               Showing <span className="font-medium text-[#111111]">{(page - 1) * limit + 1}</span> to <span className="font-medium text-[#111111]">{Math.min(page * limit, clientsData.meta.total)}</span> of <span className="font-medium text-[#111111]">{clientsData.meta.total}</span> entries
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC]"
+                className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px]"
               >
                 Previous
               </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.max(1, clientsData.meta.totalPages) }, (_, i) => i + 1).map((p) => (
+                  <Button
+                    key={p}
+                    variant={p === page ? "default" : "outline"}
+                    className={p === page
+                      ? "w-8 h-8 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 border-[#0891B2] rounded-[4px]"
+                      : "w-8 h-8 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[4px]"
+                    }
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </Button>
+                ))}
+              </div>
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => p + 1)}
-                disabled={page >= clientsData.meta.totalPages}
-                className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC]"
+                disabled={page >= Math.max(1, clientsData.meta.totalPages)}
+                className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px]"
               >
                 Next
               </Button>

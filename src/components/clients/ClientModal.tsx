@@ -70,7 +70,7 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
       website: "",
       industry: "",
       address: "",
-      status: ClientStatus.LEAD,
+      status: ClientStatus.ACTIVE,
       notes: "",
     },
   });
@@ -98,7 +98,7 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
           website: "",
           industry: "",
           address: "",
-          status: ClientStatus.LEAD,
+          status: ClientStatus.ACTIVE,
           notes: "",
         });
       }
@@ -230,76 +230,80 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
               />
             </div>
 
+            {isEditing && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[14px] font-medium text-[#111111]">Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        items={[
+                          { value: ClientStatus.LEAD, label: "Lead" },
+                          { value: ClientStatus.ACTIVE, label: "Active" },
+                          { value: ClientStatus.INACTIVE, label: "Inactive" },
+                        ]}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full bg-[#FFFFFF] border-[#E5E5E5] h-[36px]">
+                            <SelectValue placeholder="Select a status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={ClientStatus.LEAD}>Lead</SelectItem>
+                          <SelectItem value={ClientStatus.ACTIVE}>Active</SelectItem>
+                          <SelectItem value={ClientStatus.INACTIVE}>Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
-                name="status"
+                name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[14px] font-medium text-[#111111]">Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      items={[
-                        { value: ClientStatus.LEAD, label: "Lead" },
-                        { value: ClientStatus.ACTIVE, label: "Active" },
-                        { value: ClientStatus.INACTIVE, label: "Inactive" },
-                      ]}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="bg-[#FFFFFF] border-[#E5E5E5] h-[36px]">
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={ClientStatus.LEAD}>Lead</SelectItem>
-                        <SelectItem value={ClientStatus.ACTIVE}>Active</SelectItem>
-                        <SelectItem value={ClientStatus.INACTIVE}>Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className="text-[14px] font-medium text-[#111111]">Address</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Full business address"
+                        className="bg-[#FFFFFF] border-[#E5E5E5] resize-none"
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[14px] font-medium text-[#111111]">Internal Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Any additional information about this client"
+                        className="bg-[#FFFFFF] border-[#E5E5E5] resize-none"
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[14px] font-medium text-[#111111]">Address</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Full business address"
-                      className="bg-[#FFFFFF] border-[#E5E5E5] resize-none"
-                      rows={2}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[14px] font-medium text-[#111111]">Internal Notes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Any additional information about this client"
-                      className="bg-[#FFFFFF] border-[#E5E5E5] resize-none"
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* Footer */}
             <div className="mt-2 -mx-6 -mb-6 px-6 py-4 bg-[#FAFAFA] flex justify-end gap-2 border-t border-[#E5E5E5]">
