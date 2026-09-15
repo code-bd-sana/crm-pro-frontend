@@ -128,7 +128,7 @@ export default function InvoicesPage() {
   return (
     <div className="p-6 flex flex-col gap-6 h-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-semibold text-[#111111]">Invoices</h1>
           <p className="text-[#737373] text-[14px]">Manage billing and invoices</p>
@@ -145,7 +145,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-[6px] p-6 flex items-center justify-between">
           <div>
             <h3 className="text-[#737373] text-[14px] mb-2">Total Outstanding</h3>
@@ -181,9 +181,9 @@ export default function InvoicesPage() {
 
       {/* Controls */}
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="relative w-[420px]">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-[320px] md:w-[420px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737373]" />
               <Input
                 placeholder="Search invoices..."
@@ -198,7 +198,7 @@ export default function InvoicesPage() {
                 setClientFilter(e.target.value);
                 setPage(1);
               }}
-              className="h-10 rounded-xs border border-[#E5E5E5] bg-[#FFFFFF] px-3 text-[14px] text-[#111111] shadow-xs"
+              className="h-10 rounded-xs border border-[#E5E5E5] bg-[#FFFFFF] px-3 text-[14px] text-[#111111] shadow-xs w-full sm:w-auto"
             >
               <option value="">All Clients</option>
               {(clientsData?.data ?? []).map((client) => (
@@ -209,7 +209,7 @@ export default function InvoicesPage() {
             </select>
           </div>
 
-          <div className="flex items-center bg-[#F5F5F5] p-1 rounded-xs overflow-x-auto">
+          <div className="flex items-center bg-[#F5F5F5] p-1 rounded-xs overflow-x-auto w-full lg:w-auto">
             {statusTabs.map((tab) => (
               <button
                 key={tab.value}
@@ -234,13 +234,13 @@ export default function InvoicesPage() {
           <Table>
             <TableHeader className="bg-[#F5F5F5] border-b border-[#E5E5E5]">
               <TableRow className="hover:bg-transparent border-none h-[48px]">
-                <TableHead className="text-[#737373] font-medium pl-6 w-[200px]">
+                <TableHead className="text-[#737373] font-medium pl-6">
                   Invoice Number
                 </TableHead>
-                <TableHead className="text-[#737373] font-medium w-[220px]">Client</TableHead>
-                <TableHead className="text-[#737373] font-medium w-[140px]">Issue Date</TableHead>
-                <TableHead className="text-[#737373] font-medium w-[140px]">Due Date</TableHead>
-                <TableHead className="text-[#737373] font-medium w-[160px]">Amount</TableHead>
+                <TableHead className="text-[#737373] font-medium">Client</TableHead>
+                <TableHead className="text-[#737373] font-medium">Issue Date</TableHead>
+                <TableHead className="text-[#737373] font-medium">Due Date</TableHead>
+                <TableHead className="text-[#737373] font-medium">Amount</TableHead>
                 <TableHead className="text-[#737373] font-medium">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -298,32 +298,50 @@ export default function InvoicesPage() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between pt-2">
-        <p className="text-[14px] text-[#737373]">
-          Showing {filteredInvoices.length} of {totalItems} invoices
-        </p>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="bg-[#FFFFFF] hover:bg-[#F5F5F5] border-[#E5E5E5] text-[#737373] disabled:opacity-50 h-9 px-3 rounded-xs"
-          >
-            Previous
-          </Button>
-          <span className="px-3 text-[14px] text-[#737373]">
-            Page {page} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="bg-[#FFFFFF] hover:bg-[#F5F5F5] border-[#E5E5E5] text-[#737373] disabled:opacity-50 h-9 px-3 rounded-xs"
-          >
-            Next
-          </Button>
+      {data && meta && (
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
+          <p className="text-[14px] text-[#737373]">
+            Showing <span className="font-medium text-[#111111]">{(page - 1) * PAGE_SIZE + 1}</span> to <span className="font-medium text-[#111111]">{Math.min(page * PAGE_SIZE, totalItems)}</span> of <span className="font-medium text-[#111111]">{totalItems}</span> entries
+          </p>
+          <div className="flex gap-2 items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px]"
+            >
+              Previous
+            </Button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((p) => (
+                <Button
+                  key={p}
+                  variant={p === page ? "default" : "outline"}
+                  className={p === page
+                    ? "w-8 h-8 p-0 bg-[#0891B2] text-white hover:bg-[#0891B2]/90 border-[#0891B2] rounded-[4px]"
+                    : "w-8 h-8 p-0 bg-white border-[#E5E5E5] text-[#111111] hover:bg-[#F8FAFC] rounded-[4px]"
+                  }
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= Math.max(1, totalPages)}
+              onClick={() => setPage((p) => p + 1)}
+              className="h-8 text-[13px] text-[#111111] border-[#E5E5E5] hover:bg-[#F8FAFC] rounded-[4px]"
+            >
+              Next
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       <AddInvoiceModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
