@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios';
 import type {
   Invoice,
+  InvoicePayment,
   CreateInvoiceDto,
   UpdateInvoiceDto,
   PaginatedResponse,
@@ -11,9 +12,9 @@ const BASE_PATH = '/invoices';
 export interface QueryInvoiceDto {
   page?: number;
   limit?: number;
-  search?: string;
-  status?: string;
   clientId?: string;
+  projectId?: string;
+  status?: string;
 }
 
 export const getInvoices = async (query?: QueryInvoiceDto): Promise<PaginatedResponse<Invoice>> => {
@@ -48,10 +49,16 @@ export interface CreatePaymentPayload {
   transactionId?: string;
 }
 
-export const addInvoicePayment = async (id: string, data: CreatePaymentPayload): Promise<Invoice> => {
-  const response = await api.post<{ success: boolean; data: Invoice }>(`${BASE_PATH}/${id}/payments`, data);
+export const addInvoicePayment = async (id: string, data: CreatePaymentPayload): Promise<InvoicePayment> => {
+  const response = await api.post<{ success: boolean; data: InvoicePayment }>(`${BASE_PATH}/${id}/payments`, data);
   return response.data.data;
 };
+
+export function formatInvoiceAmount(value: number | string | null | undefined, currency?: string): string {
+  const amount = Number(value ?? 0);
+  const symbol = currency === 'BDT' ? '৳' : currency === 'EUR' ? '€' : currency === 'USD' ? '$' : '';
+  return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
 // TODO(backend): DELETE /invoices/:id is not implemented in the backend yet.
 // PDF download (GET /invoices/:id/download) and payment reminders

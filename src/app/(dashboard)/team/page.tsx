@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AddTeamMemberModal } from "@/components/team/AddTeamMemberModal";
-import { useQuery } from "@tanstack/react-query";
-import { getUsers } from "@/services/user.service";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUsers, deleteUser } from "@/services/user.service";
 import { useRBAC } from "@/hooks/useRBAC";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
@@ -22,14 +22,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PermissionGuard } from "@/components/shared/PermissionGuard";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/utils";
+import type { UserDetails } from "@/types/models.types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<any>(null);
+  const [editingMember, setEditingMember] = useState<UserDetails | null>(null);
+  const [deletingMember, setDeletingMember] = useState<UserDetails | null>(null);
 
+  const queryClient = useQueryClient();
   const { canManageUsers, hasPermission } = useRBAC();
   const _hasHydrated = useAuthStore((state) => state._hasHydrated);
   const router = useRouter();
@@ -43,6 +58,18 @@ export default function TeamPage() {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: getUsers,
+  });
+
+  const { mutate: removeMember, isPending: isDeleting } = useMutation({
+    mutationFn: (id: string) => deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success("Team member deleted");
+      setDeletingMember(null);
+    },
+    onError: (err: unknown) => {
+      toast.error(getErrorMessage(err, "Failed to delete team member"));
+    },
   });
 
   const filteredTeam = users?.filter((member) => {
@@ -149,7 +176,7 @@ export default function TeamPage() {
           </div>
         ) : filteredTeam.length === 0 ? (
           <div className="col-span-full py-10 text-center text-[#737373]">
-            No team members found matching "{searchQuery}"
+            No team members found matching &quot;{searchQuery}&quot;
           </div>
         ) : (
           filteredTeam.map((member) => (
@@ -185,12 +212,22 @@ export default function TeamPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px]">
                         <PermissionGuard permission={PermissionEnum.TEAM_UPDATE}>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="cursor-pointer"
                             onClick={() => setEditingMember(member)}
                           >
                             <Pencil className="w-4 h-4 mr-2" />
                             Edit Member
+                          </DropdownMenuItem>
+                        </PermissionGuard>
+                        <PermissionGuard permission={PermissionEnum.TEAM_DELETE}>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            className="cursor-pointer"
+                            onClick={() => setDeletingMember(member)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Member
                           </DropdownMenuItem>
                         </PermissionGuard>
                       </DropdownMenuContent>
@@ -248,11 +285,32 @@ export default function TeamPage() {
         onClose={() => setIsAddMemberOpen(false)}
       />
 
-      <EditTeamMemberModal 
+      <EditTeamMemberModal
         isOpen={!!editingMember}
         onClose={() => setEditingMember(null)}
         member={editingMember}
       />
+
+      <AlertDialog open={!!deletingMember} onOpenChange={(open) => !open && setDeletingMember(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete team member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove {deletingMember?.profile?.firstName}{" "}
+              {deletingMember?.profile?.lastName} ({deletingMember?.email}). This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              onClick={() => deletingMember && removeMember(deletingMember.id)}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

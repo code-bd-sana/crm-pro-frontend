@@ -297,6 +297,94 @@ export interface TaskComment {
   updatedAt: string;
 }
 
-export interface Invoice {}
-export interface CreateInvoiceDto {}
-export interface UpdateInvoiceDto {}
+// ============================================================
+// Invoices Module
+// ============================================================
+
+export enum InvoiceStatus {
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  PAID = 'PAID',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum Currency {
+  BDT = 'BDT',
+  USD = 'USD',
+  EUR = 'EUR',
+}
+
+export enum PaymentMethod {
+  CASH = 'CASH',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  MOBILE_BANKING = 'MOBILE_BANKING',
+  CARD = 'CARD',
+  OTHER = 'OTHER',
+}
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface InvoicePayment {
+  id: string;
+  amount: number;
+  paymentDate: string;
+  paymentMethod: PaymentMethod;
+  transactionId?: string | null;
+  createdAt: string;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  client?: Client;
+  project?: Project | null;
+  issueDate: string;
+  dueDate: string;
+  status: InvoiceStatus;
+  currency: Currency;
+  subTotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  amountPaid: number;
+  balanceDue: number;
+  notes?: string | null;
+  termsAndConditions?: string | null;
+  items?: InvoiceItem[];
+  payments?: InvoicePayment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInvoiceItemDto {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface CreateInvoiceDto {
+  clientId: string;
+  projectId?: string;
+  issueDate: string;
+  dueDate: string;
+  currency?: Currency;
+  taxAmount?: number;
+  discountAmount?: number;
+  notes?: string;
+  termsAndConditions?: string;
+  items: CreateInvoiceItemDto[];
+}
+
+export interface UpdateInvoiceDto {
+  status?: InvoiceStatus;
+  notes?: string;
+  termsAndConditions?: string;
+}

@@ -33,11 +33,13 @@ import { Loader2 } from "lucide-react";
 import { getRoles } from "@/services/role.service";
 import { getDepartments } from "@/services/department.service";
 import { createUser } from "@/services/user.service";
+import { getErrorMessage } from "@/lib/utils";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
   email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   phone: z.string().optional(),
   departmentId: z.string().min(1, "Department is required"),
   roleId: z.string().min(1, "Role is required"),
@@ -73,6 +75,7 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
       firstName: "",
       lastName: "",
       email: "",
+      password: "",
       phone: "",
       departmentId: "",
       roleId: "",
@@ -88,18 +91,23 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
       form.reset();
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to add team member");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to add team member"));
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    // Wrap roleId into roleIds array as expected by CreateUserDto
+    // Backend expects roleIds array; empty strings fail @IsOptional validators
     const payload = {
-      ...values,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+      phone: values.phone || undefined,
+      departmentId: values.departmentId,
+      startDate: values.startDate || undefined,
       roleIds: [values.roleId],
     };
-    // Zod's roleId is stripped and payload expects roleIds
     addMember(payload);
   };
 
@@ -168,7 +176,22 @@ export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps)
               )}
             />
 
-            {/* Row 3: Phone & Department */}
+            {/* Row 3: Password */}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[14px] font-medium text-[#111111]">Temporary Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Min. 6 characters" className="bg-[#FFFFFF] border-[#E5E5E5] text-[#111111] h-[36px]" {...field} />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
+
+            {/* Row 4: Phone & Department */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
