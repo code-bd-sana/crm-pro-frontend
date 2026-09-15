@@ -39,8 +39,8 @@ export const refreshToken = (
   payload: RefreshTokenPayload,
 ): Promise<RefreshTokenResponse> =>
   api
-    .post<RefreshTokenResponse>('/auth/refresh', payload)
-    .then((res) => res.data);
+    .post<{ success: boolean; data: RefreshTokenResponse }>('/auth/refresh-tokens', payload)
+    .then((res) => res.data.data);
 
 /**
  * Sends a password-reset email to the provided address.

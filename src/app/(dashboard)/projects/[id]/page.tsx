@@ -1,15 +1,161 @@
 "use client";
 
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Flag, Users, CheckSquare2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Calendar, Flag, Users, Plus, Trash2, Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { getProjectById, getProjectMilestones, createProjectMilestone, updateProjectMilestone, deleteProjectMilestone } from "@/services/project.service";
+import { getErrorMessage } from "@/lib/utils";
+import { ProjectMilestone, MilestoneStatus } from "@/types/models.types";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { PermissionEnum } from "@/types/auth.types";
+import { ProjectTasks } from "@/components/projects/ProjectTasks";
+import { ProjectFiles } from "@/components/projects/ProjectFiles";
+import { ProjectTeam } from "@/components/projects/ProjectTeam";
+import { EditProjectForm } from "@/components/projects/EditProjectForm";
+
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: "Low",
+  MEDIUM: "Medium",
+  HIGH: "High",
+  URGENT: "Urgent",
+};
+
+const STATUS_BADGES: Record<string, string> = {
+  ACTIVE: "bg-[#EFF6FF] text-[#0891B2] border-[#BDE0FE]",
+  ON_HOLD: "bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]",
+  COMPLETED: "bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]",
+  CANCELLED: "bg-[#FEF2F2] text-[#EF4444] border-[#FECACA]",
+};
+
+const MILESTONE_BADGES: Record<string, string> = {
+  PENDING: "bg-[#FAFAFA] text-[#737373] border-[#E5E5E5]",
+  IN_PROGRESS: "bg-[#EFF6FF] text-[#3B82F6] border-[#BFDBFE]",
+  COMPLETED: "bg-[#ECFDF5] text-[#10B981] border-transparent",
+};
 
 export default function ProjectDetailsPage() {
+  const params = useParams();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const projectId = params.id as string;
+
+  const [activeTab, setActiveTab] = useState("overview");
+  const [milestoneTitle, setMilestoneTitle] = useState("");
+  const [milestoneDueDate, setMilestoneDueDate] = useState("");
+  const [milestoneToDelete, setMilestoneToDelete] = useState<ProjectMilestone | null>(null);
+
+  const { data: project, isLoading } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: () => getProjectById(projectId),
+    enabled: !!projectId,
+  });
+
+  const { data: milestones } = useQuery({
+    queryKey: ["project", projectId, "milestones"],
+    queryFn: () => getProjectMilestones(projectId),
+    enabled: !!projectId,
+  });
+
+  const invalidateMilestones = () => {
+    queryClient.invalidateQueries({ queryKey: ["project", projectId, "milestones"] });
+    queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+  };
+
+  const { mutate: addMilestone, isPending: isAddingMilestone } = useMutation({
+    mutationFn: () =>
+      createProjectMilestone(projectId, {
+        title: milestoneTitle,
+        dueDate: milestoneDueDate || undefined,
+      }),
+    onSuccess: () => {
+      invalidateMilestones();
+      setMilestoneTitle("");
+      setMilestoneDueDate("");
+      toast.success("Milestone added");
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to add milestone"));
+    },
+  });
+
+  const { mutate: changeMilestoneStatus } = useMutation({
+    mutationFn: ({ milestoneId, status }: { milestoneId: string; status: MilestoneStatus }) =>
+      updateProjectMilestone(projectId, milestoneId, { status }),
+    onSuccess: () => {
+      invalidateMilestones();
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to update milestone"));
+    },
+  });
+
+  const { mutate: removeMilestone } = useMutation({
+    mutationFn: (milestoneId: string) => deleteProjectMilestone(projectId, milestoneId),
+    onSuccess: () => {
+      invalidateMilestones();
+      toast.success("Milestone deleted");
+      setMilestoneToDelete(null);
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to delete milestone"));
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6 p-6 min-h-full">
+        <Skeleton className="h-8 w-[240px]" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[86px] rounded-[10px]" />
+          ))}
+        </div>
+        <Skeleton className="h-[400px] rounded-[10px]" />
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-[#FAFAFA]">
+        <h2 className="text-xl font-semibold text-[#111111]">Project Not Found</h2>
+        <Button variant="link" onClick={() => router.push("/projects")} className="mt-4 text-[#0891B2]">
+          Back to Projects
+        </Button>
+      </div>
+    );
+  }
+
+  const milestoneList = milestones ?? [];
+
   return (
     <div className="flex flex-col gap-6 p-6 min-h-full">
       {/* Back Button */}
@@ -26,19 +172,26 @@ export default function ProjectDetailsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-[24px] leading-[32px] font-semibold text-[#111111]">
-            Website Redesign
+            {project.title}
           </h1>
-          <Link href="/clients/meridian" className="text-[14px] leading-[20px] font-medium text-[#0891B2] hover:underline mt-1 block">
-            Meridian Logistics
-          </Link>
+          {project.client && (
+            <Link href={`/clients/${project.client.id}`} className="text-[14px] leading-[20px] font-medium text-[#0891B2] hover:underline mt-1 block">
+              {project.client.companyName}
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-3">
-          <Badge className="bg-[#EFF6FF] text-[#0891B2] hover:bg-[#EFF6FF] border-[#BDE0FE] px-2 py-1 rounded-[4px] font-medium text-[12px]">
-            In Progress
+          <Badge className={`px-2 py-1 rounded-[4px] font-medium text-[12px] ${STATUS_BADGES[project.status] ?? STATUS_BADGES.ACTIVE}`}>
+            {project.status.replace("_", " ")}
           </Badge>
-          <Button className="h-9 px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium text-[14px] rounded-[4px]">
-            Edit Project
-          </Button>
+          <PermissionGuard permission={PermissionEnum.PROJECTS_UPDATE}>
+            <Button
+              onClick={() => setActiveTab("settings")}
+              className="h-9 px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white font-medium text-[14px] rounded-[4px]"
+            >
+              Edit Project
+            </Button>
+          </PermissionGuard>
         </div>
       </div>
 
@@ -52,7 +205,9 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[12px] leading-[16px] text-[#737373]">Deadline</span>
-              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">Apr 12, 2026</span>
+              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">
+                {project.dueDate ? format(new Date(project.dueDate), "MMM d, yyyy") : "—"}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -64,7 +219,9 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[12px] leading-[16px] text-[#737373]">Priority</span>
-              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">High</span>
+              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">
+                {PRIORITY_LABELS[project.priority] ?? project.priority}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -76,7 +233,9 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-[12px] leading-[16px] text-[#737373]">Team Size</span>
-              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">3 members</span>
+              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">
+                {(project.members ?? []).length} member{(project.members ?? []).length === 1 ? "" : "s"}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -85,8 +244,8 @@ export default function ProjectDetailsPage() {
           <CardContent className="h-full px-4 pt-4 pb-0 flex flex-col gap-2">
             <span className="text-[12px] leading-[16px] text-[#737373]">Progress</span>
             <div className="flex items-center gap-2">
-              <Progress value={75} className="flex-1" />
-              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">75%</span>
+              <Progress value={project.progress} className="flex-1" />
+              <span className="text-[14px] leading-[20px] font-medium text-[#111111]">{project.progress}%</span>
             </div>
           </CardContent>
         </Card>
@@ -94,7 +253,7 @@ export default function ProjectDetailsPage() {
       </div>
 
       {/* Tabs Section */}
-      <Tabs defaultValue="overview" className="w-full mt-2 flex flex-col gap-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-2 flex flex-col gap-6">
         <div className="flex w-full">
           <TabsList className="bg-[#F1F5F9] gap-1 h-9 p-1 rounded-[10px]">
             <TabsTrigger
@@ -131,145 +290,160 @@ export default function ProjectDetailsPage() {
         </div>
 
         <TabsContent value="overview" className="mt-0 outline-none flex flex-col gap-6">
-          
+
           {/* Description */}
-          <Card className="h-[116px] shadow-none border-[#E5E5E5] rounded-[10px] p-6 flex flex-col gap-4">
+          <Card className="shadow-none border-[#E5E5E5] rounded-[10px] p-6 flex flex-col gap-4">
             <h3 className="text-[16px] font-semibold text-[#111111]">Description</h3>
             <p className="text-[14px] leading-[20px] text-[#737373]">
-              Complete overhaul of the company website with modern design, improved UX, and mobile optimization.
+              {project.description || "No description provided."}
             </p>
           </Card>
 
           {/* Milestones */}
-          <Card className="h-[340px] shadow-none border-[#E5E5E5] rounded-[10px] p-6 flex flex-col gap-4">
-            <h3 className="text-[16px] font-semibold text-[#111111]">Milestones</h3>
-            
+          <Card className="shadow-none border-[#E5E5E5] rounded-[10px] p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[16px] font-semibold text-[#111111]">Milestones</h3>
+              <span className="text-[13px] text-[#737373]">{milestoneList.length} total</span>
+            </div>
+
+            <PermissionGuard permission={PermissionEnum.PROJECTS_UPDATE}>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  placeholder="New milestone title"
+                  value={milestoneTitle}
+                  onChange={(e) => setMilestoneTitle(e.target.value)}
+                  className="flex-1 h-9 border-[#E5E5E5] focus-visible:ring-[#0891B2] bg-[#FFFFFF] text-[#111111] placeholder:text-[#737373]"
+                />
+                <Input
+                  type="date"
+                  value={milestoneDueDate}
+                  onChange={(e) => setMilestoneDueDate(e.target.value)}
+                  className="sm:w-[160px] h-9 border-[#E5E5E5] focus-visible:ring-[#0891B2] bg-[#FFFFFF] text-[#111111]"
+                />
+                <Button
+                  onClick={() => addMilestone()}
+                  disabled={!milestoneTitle.trim() || isAddingMilestone}
+                  className="h-9 px-4 bg-[#0891B2] hover:bg-[#0891B2]/90 text-white rounded-[4px] font-medium shrink-0"
+                >
+                  {isAddingMilestone ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4 mr-1" />}
+                  Add
+                </Button>
+              </div>
+            </PermissionGuard>
+
             <div className="flex flex-col gap-4 mt-2">
-              {/* Milestone 1 */}
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 shrink-0 rounded-full border-2 border-[#10B981] text-white flex items-center justify-center font-bold text-[14px] bg-[#10B981]">
-                  ✓
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] leading-[20px] font-medium text-[#111111]">Discovery & Research</h4>
-                    <p className="text-[12px] leading-[16px] text-[#737373]">Due Mar 15</p>
+              {milestoneList.length === 0 ? (
+                <p className="text-[14px] text-[#737373] py-4 text-center">No milestones yet.</p>
+              ) : (
+                milestoneList.map((milestone, index) => (
+                  <div key={milestone.id} className="flex items-center gap-4">
+                    <div
+                      className={`w-9 h-9 shrink-0 rounded-full flex items-center justify-center font-semibold text-[14px] ${
+                        milestone.status === MilestoneStatus.COMPLETED
+                          ? "border-2 border-[#10B981] text-white bg-[#10B981]"
+                          : milestone.status === MilestoneStatus.IN_PROGRESS
+                            ? "border-2 border-[#0891B2] text-[#0891B2] bg-white"
+                            : "border border-[#E5E5E5] text-[#A3A3A3] bg-white"
+                      }`}
+                    >
+                      {milestone.status === MilestoneStatus.COMPLETED ? "✓" : index + 1}
+                    </div>
+                    <div className="flex-1 flex justify-between items-center gap-2">
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <h4 className="text-[14px] leading-[20px] font-medium text-[#111111] truncate">{milestone.title}</h4>
+                        {milestone.dueDate && (
+                          <p className="text-[12px] leading-[16px] text-[#737373]">
+                            Due {format(new Date(milestone.dueDate), "MMM d")}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <PermissionGuard
+                          fallback={
+                            <Badge className={`${MILESTONE_BADGES[milestone.status] ?? MILESTONE_BADGES.PENDING} hover:bg-inherit font-medium rounded-[4px] shadow-none`}>
+                              {milestone.status.replace("_", " ")}
+                            </Badge>
+                          }
+                          permission={PermissionEnum.PROJECTS_UPDATE}
+                        >
+                          <Select
+                            value={milestone.status}
+                            onValueChange={(status) =>
+                              changeMilestoneStatus({ milestoneId: milestone.id, status: status as MilestoneStatus })
+                            }
+                            items={[
+                              { value: MilestoneStatus.PENDING, label: "Pending" },
+                              { value: MilestoneStatus.IN_PROGRESS, label: "In Progress" },
+                              { value: MilestoneStatus.COMPLETED, label: "Completed" },
+                            ]}
+                          >
+                            <SelectTrigger className="h-8 w-[150px] border-[#E5E5E5] !bg-[#FFFFFF] text-[12px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={MilestoneStatus.PENDING}>Pending</SelectItem>
+                              <SelectItem value={MilestoneStatus.IN_PROGRESS}>In Progress</SelectItem>
+                              <SelectItem value={MilestoneStatus.COMPLETED}>Completed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <button
+                            onClick={() => setMilestoneToDelete(milestone)}
+                            className="text-[#737373] hover:text-[#EF4444] transition-colors p-1"
+                            aria-label="Delete milestone"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </PermissionGuard>
+                      </div>
+                    </div>
                   </div>
-                  <Badge className="bg-[#ECFDF5] text-[#10B981] hover:bg-[#ECFDF5] border-transparent font-medium rounded-[4px] shadow-none">
-                    Completed
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Milestone 2 */}
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 shrink-0 rounded-full border-2 border-[#10B981] text-white flex items-center justify-center font-bold text-[14px] bg-[#10B981]">
-                  ✓
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] leading-[20px] font-medium text-[#111111]">Design Mockups</h4>
-                    <p className="text-[12px] leading-[16px] text-[#737373]">Due Mar 25</p>
-                  </div>
-                  <Badge className="bg-[#ECFDF5] text-[#10B981] hover:bg-[#ECFDF5] border-transparent font-medium rounded-[4px] shadow-none">
-                    Completed
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Milestone 3 */}
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 shrink-0 rounded-full border-2 border-[#0891B2] text-[#0891B2] flex items-center justify-center font-semibold text-[14px] bg-white">
-                  3
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] leading-[20px] font-medium text-[#111111]">Development</h4>
-                    <p className="text-[12px] leading-[16px] text-[#737373]">Due Apr 10</p>
-                  </div>
-                  <Badge className="bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#EFF6FF] border-[#BFDBFE] font-medium rounded-[4px] shadow-none">
-                    in progress
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Milestone 4 */}
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 shrink-0 rounded-full border border-[#E5E5E5] text-[#A3A3A3] flex items-center justify-center font-semibold text-[14px] bg-white">
-                  4
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] leading-[20px] font-medium text-[#111111]">Testing & QA</h4>
-                    <p className="text-[12px] leading-[16px] text-[#737373]">Due Apr 12</p>
-                  </div>
-                  <Badge className="bg-[#FAFAFA] text-[#737373] hover:bg-[#FAFAFA] border-[#E5E5E5] font-medium rounded-[4px] shadow-none">
-                    Pending
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Milestone 5 */}
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 shrink-0 rounded-full border border-[#E5E5E5] text-[#A3A3A3] flex items-center justify-center font-semibold text-[14px] bg-white">
-                  5
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] leading-[20px] font-medium text-[#111111]">Launch</h4>
-                    <p className="text-[12px] leading-[16px] text-[#737373]">Due Apr 15</p>
-                  </div>
-                  <Badge className="bg-[#FAFAFA] text-[#737373] hover:bg-[#FAFAFA] border-[#E5E5E5] font-medium rounded-[4px] shadow-none">
-                    Pending
-                  </Badge>
-                </div>
-              </div>
+                ))
+              )}
             </div>
           </Card>
 
-          {/* Recent Tasks */}
-          <Card className="h-[244px] shadow-none border-[#E5E5E5] rounded-[10px] p-6 flex flex-col justify-between">
-            <h3 className="text-[16px] font-semibold text-[#111111]">Recent Tasks</h3>
-            
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <Checkbox id="task-1" defaultChecked className="w-5 h-5 border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white rounded-[4px]" />
-                <label htmlFor="task-1" className="text-[14px] leading-[20px] font-medium text-[#737373] line-through cursor-pointer">
-                  Create homepage design
-                </label>
-              </div>
+          {/* Tasks Preview */}
+          <ProjectTasks projectId={projectId} />
+        </TabsContent>
 
-              <div className="flex items-center gap-3">
-                <Checkbox id="task-2" defaultChecked className="w-5 h-5 border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white rounded-[4px]" />
-                <label htmlFor="task-2" className="text-[14px] leading-[20px] font-medium text-[#737373] line-through cursor-pointer">
-                  Implement responsive navigation
-                </label>
-              </div>
+        <TabsContent value="tasks" className="mt-0 outline-none">
+          <ProjectTasks projectId={projectId} />
+        </TabsContent>
 
-              <div className="flex items-center gap-3">
-                <Checkbox id="task-3" className="w-5 h-5 border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white rounded-[4px]" />
-                <label htmlFor="task-3" className="text-[14px] leading-[20px] font-medium text-[#111111] cursor-pointer">
-                  Build product catalog
-                </label>
-              </div>
+        <TabsContent value="files" className="mt-0 outline-none">
+          <ProjectFiles projectId={projectId} />
+        </TabsContent>
 
-              <div className="flex items-center gap-3">
-                <Checkbox id="task-4" className="w-5 h-5 border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white rounded-[4px]" />
-                <label htmlFor="task-4" className="text-[14px] leading-[20px] font-medium text-[#111111] cursor-pointer">
-                  Add contact form
-                </label>
-              </div>
+        <TabsContent value="team" className="mt-0 outline-none">
+          <ProjectTeam project={project} />
+        </TabsContent>
 
-              <div className="flex items-center gap-3">
-                <Checkbox id="task-5" className="w-5 h-5 border-[#E5E5E5] data-checked:bg-[#0891B2] data-checked:border-[#0891B2] data-checked:text-white rounded-[4px]" />
-                <label htmlFor="task-5" className="text-[14px] leading-[20px] font-medium text-[#111111] cursor-pointer">
-                  Setup analytics
-                </label>
-              </div>
-            </div>
-          </Card>
+        <TabsContent value="settings" className="mt-0 outline-none">
+          <EditProjectForm project={project} />
         </TabsContent>
       </Tabs>
+
+      {/* Delete Milestone Confirmation */}
+      <AlertDialog open={!!milestoneToDelete} onOpenChange={(open) => !open && setMilestoneToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete milestone?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the milestone{" "}
+              <span className="font-semibold text-black">{milestoneToDelete?.title}</span>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => milestoneToDelete && removeMilestone(milestoneToDelete.id)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );

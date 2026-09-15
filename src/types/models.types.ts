@@ -147,12 +147,127 @@ export interface PaginatedResponse<T> {
 }
 
 
-export interface Project {}
-export interface CreateProjectDto {}
-export interface UpdateProjectDto {}
-export interface Task {}
-export interface CreateTaskDto {}
-export interface UpdateTaskDto {}
+// ============================================================
+// Projects Module
+// ============================================================
+
+export enum ProjectStatus {
+  ACTIVE = 'ACTIVE',
+  ON_HOLD = 'ON_HOLD',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum ProjectPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
+}
+
+export enum MilestoneStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
+
+export interface ProjectMilestone {
+  id: string;
+  projectId: string;
+  title: string;
+  dueDate?: string | null;
+  status: MilestoneStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMilestoneDto {
+  title: string;
+  dueDate?: string;
+  status?: MilestoneStatus;
+}
+
+export type UpdateMilestoneDto = Partial<CreateMilestoneDto>;
+
+export interface Project {
+  id: string;
+  client?: Client;
+  title: string;
+  description?: string | null;
+  budget: number;
+  priority: ProjectPriority;
+  status: ProjectStatus;
+  progress: number;
+  startDate?: string | null;
+  dueDate?: string | null;
+  milestones?: ProjectMilestone[];
+  members?: User[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+}
+
+export interface CreateProjectDto {
+  title: string;
+  description?: string;
+  clientId: string;
+  budget?: number;
+  priority?: ProjectPriority;
+  status?: ProjectStatus;
+  startDate?: string;
+  dueDate?: string;
+  memberIds?: string[];
+}
+
+export interface UpdateProjectDto extends Partial<CreateProjectDto> {
+  progress?: number;
+}
+
+// ============================================================
+// Tasks Module
+// ============================================================
+
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+
+export enum TaskPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+}
+
+export interface Task {
+  id: string;
+  project?: Project;
+  projectId: string;
+  assignee?: User | null;
+  assigneeId?: string | null;
+  title: string;
+  description?: string | null;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate?: string | null;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTaskDto {
+  title: string;
+  projectId: string;
+  assigneeId?: string;
+  description?: string;
+  priority?: TaskPriority;
+  status?: TaskStatus;
+  dueDate?: string;
+  tags?: string[];
+}
+
+export type UpdateTaskDto = Partial<CreateTaskDto>;
 export interface Invoice {}
 export interface CreateInvoiceDto {}
 export interface UpdateInvoiceDto {}

@@ -41,6 +41,18 @@ export const updateInvoice = async (id: string, data: UpdateInvoiceDto): Promise
   return response.data.data;
 };
 
-export const deleteInvoice = async (id: string): Promise<void> => {
-  await api.delete(`${BASE_PATH}/${id}`);
+export interface CreatePaymentPayload {
+  amount: number;
+  paymentDate: string;
+  paymentMethod: string;
+  transactionId?: string;
+}
+
+export const addInvoicePayment = async (id: string, data: CreatePaymentPayload): Promise<Invoice> => {
+  const response = await api.post<{ success: boolean; data: Invoice }>(`${BASE_PATH}/${id}/payments`, data);
+  return response.data.data;
 };
+
+// TODO(backend): DELETE /invoices/:id is not implemented in the backend yet.
+// PDF download (GET /invoices/:id/download) and payment reminders
+// (POST /invoices/:id/reminders) are also pending backend support.

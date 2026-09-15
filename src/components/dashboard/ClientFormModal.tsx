@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { createClient, updateClient } from "@/services/client.service";
+import { getErrorMessage } from "@/lib/utils";
 import { ClientStatus, Client } from "@/types/models.types";
 import { useEffect } from "react";
 
@@ -101,8 +102,8 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
       toast.success(isEditMode ? "Client updated successfully" : "Client added successfully");
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'add'} client`);
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'add'} client`));
     },
   });
 
@@ -239,7 +240,16 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                 render={({ field }) => (
                   <FormItem className="flex flex-col gap-2">
                     <FormLabel className="text-[#111111] font-medium text-[14px] leading-[14px]">Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue={field.value}
+                      items={[
+                        { value: ClientStatus.LEAD, label: "Lead" },
+                        { value: ClientStatus.ACTIVE, label: "Active" },
+                        { value: ClientStatus.INACTIVE, label: "Inactive" },
+                      ]}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full h-[36px] border-[#E5E5E5] !bg-[#FFFFFF] text-[#111111] data-[state=open]:ring-[#0891B2]">
                           <SelectValue placeholder="Status" />

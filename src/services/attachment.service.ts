@@ -2,13 +2,26 @@ import { api } from '@/lib/axios';
 
 const BASE_PATH = '/attachments';
 
-export const uploadAttachment = async (file: File, entityType: string, entityId: string) => {
+export type AttachmentResourceType = 'TASK' | 'PROJECT';
+
+export interface Attachment {
+  id: string;
+  resourceType: AttachmentResourceType;
+  resourceId: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  createdAt: string;
+}
+
+export const uploadAttachment = async (file: File, resourceType: AttachmentResourceType, resourceId: string) => {
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('entityType', entityType);
-  formData.append('entityId', entityId);
+  formData.append('resourceType', resourceType);
+  formData.append('resourceId', resourceId);
 
-  const response = await api.post<{ success: boolean; data: any }>(BASE_PATH, formData, {
+  const response = await api.post<{ success: boolean; data: Attachment }>(BASE_PATH, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -16,9 +29,9 @@ export const uploadAttachment = async (file: File, entityType: string, entityId:
   return response.data.data;
 };
 
-export const getAttachments = async (entityType: string, entityId: string) => {
-  const response = await api.get<{ success: boolean; data: any[] }>(BASE_PATH, {
-    params: { entityType, entityId },
+export const getAttachments = async (resourceType: AttachmentResourceType, resourceId: string) => {
+  const response = await api.get<{ success: boolean; data: Attachment[] }>(BASE_PATH, {
+    params: { resourceType, resourceId },
   });
   return response.data.data;
 };

@@ -58,15 +58,18 @@ api.interceptors.response.use(
 
       try {
         // Use a plain axios call (not the intercepted `api`) to avoid loops
+        // Backend wraps the response in { success, data: { accessToken, refreshToken } }
         const response = await axios.post<{
-          accessToken: string;
-          refreshToken: string;
+          data: {
+            accessToken: string;
+            refreshToken: string;
+          };
         }>(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-tokens`,
           { refreshToken: storedRefreshToken },
         );
 
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, refreshToken } = response.data.data;
         useAuthStore.getState().setTokens(accessToken, refreshToken);
 
         // Retry the original request with the new token

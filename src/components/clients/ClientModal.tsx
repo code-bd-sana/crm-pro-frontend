@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createClient, updateClient } from "@/services/client.service";
+import { getErrorMessage } from "@/lib/utils";
 import { ClientStatus } from "@/types/models.types";
 import type { Client } from "@/types/models.types";
 
@@ -116,8 +117,8 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
       toast.success(`Client ${isEditing ? 'updated' : 'created'} successfully`);
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} client`);
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, `Failed to ${isEditing ? 'update' : 'create'} client`));
     },
   });
 
@@ -236,7 +237,15 @@ export function ClientModal({ isOpen, onClose, clientToEdit }: ClientModalProps)
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[14px] font-medium text-[#111111]">Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      items={[
+                        { value: ClientStatus.LEAD, label: "Lead" },
+                        { value: ClientStatus.ACTIVE, label: "Active" },
+                        { value: ClientStatus.INACTIVE, label: "Inactive" },
+                      ]}
+                    >
                       <FormControl>
                         <SelectTrigger className="bg-[#FFFFFF] border-[#E5E5E5] h-[36px]">
                           <SelectValue placeholder="Select a status" />
