@@ -21,6 +21,7 @@ function getGreeting(): string {
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const firstName = user?.profile?.firstName || "User";
 
   const { data: dashboardData, isLoading } = useQuery({
@@ -54,7 +55,7 @@ export default function DashboardPage() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-6">
-        <RevenueChart />
+        {hasPermission("reports.read") && <RevenueChart />}
         <TaskStatusChart tasksByStatus={dashboardData?.summary?.tasksByStatus} isLoading={isLoading} />
       </div>
 

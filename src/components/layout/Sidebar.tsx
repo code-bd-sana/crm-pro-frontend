@@ -18,17 +18,18 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useUIStore } from "@/store/useUIStore";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { PermissionEnum } from "@/types/auth.types";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Clients", href: "/clients", icon: Users },
-  { name: "Projects", href: "/projects", icon: FolderKanban },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare },
-  { name: "Invoices", href: "/invoices", icon: FileText },
-  { name: "Team", href: "/team", icon: UsersRound },
-  { name: "Departments", href: "/departments", icon: Building },
-  { name: "Reports", href: "/reports", icon: BarChart2 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard, permission: PermissionEnum.DASHBOARD_READ },
+  { name: "Clients", href: "/clients", icon: Users, permission: PermissionEnum.CLIENTS_READ },
+  { name: "Projects", href: "/projects", icon: FolderKanban, permission: PermissionEnum.PROJECTS_READ },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare, permission: PermissionEnum.TASKS_READ },
+  { name: "Invoices", href: "/invoices", icon: FileText, permission: PermissionEnum.INVOICES_READ },
+  { name: "Team", href: "/team", icon: UsersRound, permission: PermissionEnum.TEAM_READ },
+  { name: "Departments", href: "/departments", icon: Building, permission: PermissionEnum.DEPARTMENTS_READ },
+  { name: "Reports", href: "/reports", icon: BarChart2, permission: PermissionEnum.REPORTS_READ },
+  { name: "Settings", href: "/settings", icon: Settings, permission: PermissionEnum.SETTINGS_READ },
 ];
 
 const LogoutIcon = () => (
@@ -42,10 +43,15 @@ const LogoutIcon = () => (
 export default function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const logout = useAuthStore((state) => state.logout);
   const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
   const closeSidebar = useUIStore((state) => state.closeSidebar);
   const router = useRouter();
+
+  const visibleNavigation = navigation.filter((item) =>
+    item.permission ? hasPermission(item.permission) : true
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -104,7 +110,7 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto pt-4 px-3 space-y-1">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
