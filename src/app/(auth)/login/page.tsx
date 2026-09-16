@@ -192,9 +192,9 @@ export default function LoginPage() {
         </a>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-[#737373]">
+        {/* <p className="mt-6 text-center text-xs text-[#737373]">
           Don&apos;t have an account? <Link href="/register" className="text-[#111111] font-medium hover:underline">Create Account</Link>
-        </p>
+        </p> */}
 
       </div>
     </div>
